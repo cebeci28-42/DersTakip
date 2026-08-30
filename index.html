@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#2563eb">
+
+<link rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="icons/icon-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#4a90d9">
@@ -1560,5 +1568,17 @@
         console.log('✅ Ders Takip başlatıldı. (APK modu: ' + isAndroidApp() + ')');
         console.log('💵 Aylık kazanç bölümü eklendi!');
     </script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js")
+            .then(function () {
+                console.log("Ders Takip hazır.");
+            })
+            .catch(function (error) {
+                console.log("Service Worker hatası:", error);
+            });
+    });
+}
+</script>
 </body>
 </html>
