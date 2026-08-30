@@ -1,7 +1,7 @@
 <!--
 MIT License
 
-Copyright (c) 2026 [Adınız Soyadınız]
+Copyright (c) 2026 [Mustafa CEBECİ]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,30 +33,17 @@ SOFTWARE.
     <meta name="application-name" content="Ders Takip">
     <meta name="apple-mobile-web-app-title" content="Ders Takip">
     
-    <!-- Manifest (Inline - Base64 Icon ile) -->
-    <link rel="manifest" href="data:application/json,{
-        &quot;name&quot;:&quot;Ders Takip&quot;,
-        &quot;short_name&quot;:&quot;Ders Takip&quot;,
-        &quot;description&quot;:&quot;Öğrenci koçluğu ve ders takip uygulaması&quot;,
-        &quot;start_url&quot;:&quot;.&quot;,
-        &quot;display&quot;:&quot;standalone&quot;,
-        &quot;background_color&quot;:&quot;#f0f2f5&quot;,
-        &quot;theme_color&quot;:&quot;#4a90d9&quot;,
-        &quot;orientation&quot;:&quot;portrait&quot;,
-        &quot;icons&quot;:[
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_16]&quot;,&quot;sizes&quot;:&quot;16x16&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_32]&quot;,&quot;sizes&quot;:&quot;32x32&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_64]&quot;,&quot;sizes&quot;:&quot;64x64&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_72]&quot;,&quot;sizes&quot;:&quot;72x72&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_96]&quot;,&quot;sizes&quot;:&quot;96x96&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_128]&quot;,&quot;sizes&quot;:&quot;128x128&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_144]&quot;,&quot;sizes&quot;:&quot;144x144&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_192]&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_256]&quot;,&quot;sizes&quot;:&quot;256x256&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_384]&quot;,&quot;sizes&quot;:&quot;384x384&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
-            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_512]&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;}
-        ]
-    }">
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('✅ Service Worker kaydedildi'))
+                .catch(err => console.log('❌ Service Worker hatası:', err));
+        }
+    </script>
     
     <title>Ders Takip</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
@@ -1612,7 +1599,7 @@ SOFTWARE.
         console.log('✅ Ders Takip başlatıldı. (APK modu: ' + isAndroidApp() + ')');
         console.log('💵 Aylık kazanç bölümü eklendi!');
         console.log('📱 MIT Lisansı ile açık kaynak');
-        console.log('🖼️ PWA iconlar Base64 olarak eklendi!');
+        console.log('🔄 Service Worker ile çevrimdışı destek aktif!');
     </script>
 </body>
 </html>
