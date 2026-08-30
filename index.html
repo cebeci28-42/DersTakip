@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4a90d9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Ders Takip">
+    <meta name="apple-mobile-web-app-title" content="Ders Takip">
+    
+    <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Ders Takip&quot;,&quot;short_name&quot;:&quot;Ders Takip&quot;,&quot;description&quot;:&quot;Öğrenci koçluğu ve ders takip uygulaması&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#f0f2f5&quot;,&quot;theme_color&quot;:&quot;#4a90d9&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%234a90d9'/%3E%3Ctext x='256' y='340' font-size='240' text-anchor='middle' fill='white' font-family='Arial'%3E📚%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%234a90d9'/%3E%3Ctext x='256' y='340' font-size='240' text-anchor='middle' fill='white' font-family='Arial'%3E📚%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;,&quot;purpose&quot;:&quot;any maskable&quot;}]}">
+    
+    <title>Ders Takip</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== TÜM STİLLER AYNEN ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 16px; color: #333; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        .container { max-width: 1400px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); padding: 20px 24px; }
+        h1 { font-size: 32px; margin-bottom: 16px; color: #1a3c5e; border-bottom: 3px solid #4a90d9; padding-bottom: 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; font-family: 'Playfair Display', 'Segoe UI', serif; font-weight: 700; font-style: italic; letter-spacing: 1px; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; flex-wrap: wrap; }
+        .tab-btn { background: transparent; border: none; padding: 10px 18px; font-size: 15px; font-weight: 600; color: #4a5568; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab-btn:hover { background: #f7fafc; }
+        .tab-btn.active { color: #4a90d9; border-bottom-color: #4a90d9; }
+        .tab-content { display: none; animation: fade 0.25s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+        .section-header h2 { font-size: 20px; color: #1a3c5e; }
+        .btn { padding: 6px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-primary { background: #4a90d9; color: #fff; }
+        .btn-primary:hover { background: #357abd; }
+        .btn-success { background: #38a169; color: #fff; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-danger { background: #e53e3e; color: #fff; }
+        .btn-danger:hover { background: #c53030; }
+        .btn-warning { background: #d69e2e; color: #fff; }
+        .btn-warning:hover { background: #b7791f; }
+        .btn-secondary { background: #718096; color: #fff; }
+        .btn-secondary:hover { background: #4a5568; }
+        .btn-outline { background: transparent; border: 1.5px solid #cbd5e0; color: #4a5568; }
+        .btn-outline:hover { background: #edf2f7; }
+        .btn-sm { padding: 3px 10px; font-size: 12px; }
+        .btn-purple { background: #8b5cf6; color: #fff; }
+        .btn-purple:hover { background: #7c3aed; }
+        .btn-gold { background: #d69e2e; color: #fff; }
+        .btn-gold:hover { background: #b7791f; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+        .form-group label { font-weight: 600; font-size: 12px; color: #4a5568; }
+        .form-group input, .form-group select { padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; background: #fff; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: #4a90d9; outline: none; box-shadow: 0 0 0 3px rgba(74,144,217,0.2); }
+        .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+        .table-wrap { overflow-x: auto; margin-top: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table th { background: #edf2f7; color: #2d3748; font-weight: 600; padding: 10px 8px; text-align: left; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+        table td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        table tr:hover { background: #f7fafc; }
+        .whatsapp-link { color: #25D366; text-decoration: none; font-weight: 500; transition: 0.15s; display: inline-flex; align-items: center; gap: 4px; }
+        .whatsapp-link:hover { color: #128C7E; text-decoration: underline; }
+        .whatsapp-link .wa-icon { font-size: 18px; }
+        tr.has-debt { background: #fee2e2 !important; }
+        tr.has-debt:hover { background: #fecaca !important; }
+        tr.no-debt { background: #dcfce7 !important; }
+        tr.no-debt:hover { background: #bbf7d0 !important; }
+        tr.paid-lesson { background: #dcfce7 !important; }
+        tr.paid-lesson:hover { background: #bbf7d0 !important; }
+        tr.unpaid-lesson { background: #fee2e2 !important; }
+        tr.unpaid-lesson:hover { background: #fecaca !important; }
+        .badge { display: inline-block; padding: 2px 12px; border-radius: 30px; font-size: 11px; font-weight: 600; }
+        .badge-paid { background: #c6f6d5; color: #276749; }
+        .badge-unpaid { background: #fed7d7; color: #9b2c2c; }
+        .badge-completed { background: #bee3f8; color: #2a69ac; }
+        .badge-planned { background: #e2e8f0; color: #4a5568; }
+        .empty-msg { text-align: center; padding: 30px 0; color: #a0aec0; font-size: 15px; }
+        .summary-cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+        .summary-card { background: #f7fafc; padding: 14px 20px; border-radius: 12px; flex: 1 1 150px; min-width: 130px; cursor: default; transition: 0.15s; }
+        .summary-card.clickable { cursor: pointer; }
+        .summary-card.clickable:hover { background: #edf2f7; transform: scale(1.02); }
+        .summary-card .label { font-size: 12px; color: #718096; }
+        .summary-card .value { font-size: 24px; font-weight: 700; color: #1a3c5e; margin-top: 2px; }
+        .summary-card .value.positive { color: #38a169; }
+        .summary-card .value.negative { color: #e53e3e; }
+        .summary-card .value.gold { color: #d69e2e; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 999; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: #fff; border-radius: 16px; padding: 24px 28px; max-width: 700px; width: 92%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideDown 0.25s ease; max-height: 90vh; overflow-y: auto; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal h3 { font-size: 19px; margin-bottom: 14px; color: #1a3c5e; }
+        .inline-flex { display: flex; gap: 4px; flex-wrap: wrap; }
+        .upcoming-section { background: #f0f7ff; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; border-left: 4px solid #4a90d9; }
+        .upcoming-section h3 { font-size: 17px; color: #1a3c5e; margin-bottom: 6px; }
+        .upcoming-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .upcoming-item { background: #fff; padding: 6px 14px; border-radius: 30px; font-size: 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; cursor: pointer; transition: 0.15s; background: #fff5f5; border-color: #fc8181; font-weight: 500; }
+        .upcoming-item:hover { background: #fed7d7; border-color: #e53e3e; transform: scale(1.02); }
+        .student-lesson-list { max-height: 400px; overflow-y: auto; }
+        .exam-form { background: #f7fafc; padding: 16px 18px; border-radius: 12px; margin-bottom: 20px; }
+        .exam-subjects { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 10px; }
+        .subject-group { background: #fff; border-radius: 8px; padding: 10px 12px; border: 1px solid #e2e8f0; }
+        .subject-group h4 { font-size: 14px; margin-bottom: 4px; color: #1a3c5e; }
+        .subject-group .input-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+        .subject-group .input-row label { font-size: 11px; font-weight: 600; color: #4a5568; }
+        .subject-group .input-row input { width: 40px; padding: 3px 4px; border: 1px solid #cbd5e0; border-radius: 4px; text-align: center; font-size: 12px; }
+        .subject-group .input-row input::placeholder { color: #a0aec0; font-size: 11px; }
+        .subject-group .net-display { font-size: 12px; font-weight: 600; color: #4a90d9; margin-top: 2px; }
+        .exam-chart-container { margin: 20px 0; padding: 16px; background: #f7fafc; border-radius: 12px; }
+        .exam-chart-container canvas { max-height: 300px; width: 100% !important; }
+        .share-btn-area { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .analysis-box { background: #f3e8ff; border-left: 4px solid #8b5cf6; padding: 16px 20px; border-radius: 12px; margin-top: 16px; }
+        .analysis-box h4 { color: #6b21a8; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .analysis-box p { font-size: 14px; line-height: 1.8; color: #1e1b4b; white-space: pre-line; }
+        .analysis-box .share-btn { margin-top: 12px; }
+        .compare-report { background: #f7fafc; border-radius: 12px; padding: 20px; margin-top: 12px; }
+        .compare-report .report-header { border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; flex-wrap: wrap; }
+        .compare-report .report-header h3 { font-size: 18px; color: #1a3c5e; }
+        .compare-report .report-header span { font-size: 13px; color: #718096; }
+        .compare-report table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+        .compare-report table th { background: #edf2f7; padding: 10px 8px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+        .compare-report table td { padding: 8px; border-bottom: 1px solid #e2e8f0; }
+        .compare-report .compare-chart-container { margin-top: 16px; padding: 16px; background: #fff; border-radius: 12px; }
+        .compare-select-area { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+        .compare-select-area select { padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; min-width: 150px; }
+        .notification-banner { background: #e8f0fe; border: 1px solid #4a90d9; border-radius: 12px; padding: 12px 18px; margin-bottom: 16px; display: none; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .notification-banner .msg { font-size: 14px; color: #1a3c5e; display: flex; align-items: center; gap: 8px; }
+        .notification-banner .msg .bell { font-size: 24px; animation: ring 2s infinite; }
+        @keyframes ring { 0%,100% { transform: rotate(0); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
+        .notification-banner .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        
+        /* ===== KAZANÇ BÖLÜMÜ STİLLERİ ===== */
+        .earnings-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .earnings-summary .card {
+            background: #f7fafc;
+            padding: 16px 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: 0.2s;
+        }
+        .earnings-summary .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .earnings-summary .card .label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .earnings-summary .card .value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .earnings-summary .card .value.gold { color: #d69e2e; }
+        .earnings-summary .card .value.green { color: #38a169; }
+        .earnings-summary .card .value.blue { color: #4a90d9; }
+        .earnings-summary .card .value.red { color: #e53e3e; }
+
+        .earnings-chart-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        .earnings-chart-container h4 {
+            font-size: 16px;
+            color: #1a3c5e;
+            margin-bottom: 12px;
+        }
+        .earnings-chart-container canvas {
+            max-height: 250px;
+            width: 100% !important;
+        }
+
+        .month-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .month-selector select {
+            padding: 6px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #fff;
+        }
+        .month-selector .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 640px) { 
+            .container { padding: 12px; } 
+            .tabs .tab-btn { padding: 8px 12px; font-size: 13px; } 
+            .modal { padding: 18px; } 
+            .exam-subjects { grid-template-columns: 1fr 1fr; } 
+            .compare-select-area { flex-direction: column; align-items: stretch; } 
+            h1 { font-size: 26px; }
+            .earnings-summary { grid-template-columns: 1fr 1fr; }
+            .earnings-summary .card .value { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✒️ Ders Takip</h1>
+
+        <div id="notification-banner" class="notification-banner">
+            <div class="msg">
+                <span class="bell">🔔</span>
+                <span id="banner-text">Bildirimler aktif!</span>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary btn-sm" onclick="requestNotificationPermission()">📢 Bildirim İzni Ver</button>
+                <button class="btn btn-secondary btn-sm" onclick="scheduleUpcomingNotifications()">⏰ Yaklaşan Dersleri Bildir</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn" data-tab="tab-students">👨‍🎓 Öğrenciler</button>
+            <button class="tab-btn active" data-tab="tab-lessons">📅 Ders Planlama</button>
+            <button class="tab-btn" data-tab="tab-completed">✅ Tamamlanan</button>
+            <button class="tab-btn" data-tab="tab-payments">💰 Ödeme</button>
+            <button class="tab-btn" data-tab="tab-earnings">💵 Aylık Kazanç</button>
+            <button class="tab-btn" data-tab="tab-exams">📊 Deneme</button>
+            <button class="tab-btn" data-tab="tab-compare">📊 Karşılaştır</button>
+        </div>
+
+        <!-- ÖĞRENCİLER -->
+        <div id="tab-students" class="tab-content">
+            <div class="section-header">
+                <h2>Öğrenci Listesi</h2>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                    <button class="btn btn-primary" onclick="openStudentModal()">+ Yeni Öğrenci</button>
+                    <select id="sort-select" onchange="applySort()" style="padding:6px 10px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px;">
+                        <option value="name-asc">İsim (A-Z)</option>
+                        <option value="name-desc">İsim (Z-A)</option>
+                        <option value="class-asc">Sınıf (Artan)</option>
+                        <option value="class-desc">Sınıf (Azalan)</option>
+                    </select>
+                </div>
+            </div>
+            <div id="student-list"><div class="empty-msg">Henüz öğrenci eklenmemiş.</div></div>
+        </div>
+
+        <!-- DERS PLANLAMA -->
+        <div id="tab-lessons" class="tab-content active">
+            <div class="section-header">
+                <h2>Ders Programı</h2>
+                <button class="btn btn-primary" onclick="openLessonModal()">+ Ders Planla</button>
+            </div>
+            <div id="upcoming-container" class="upcoming-section">
+                <h3>⏳ Önümüzdeki 24 Saat İçindeki Dersler</h3>
+                <div id="upcoming-24h" class="upcoming-list">
+                    <span class="empty-msg" style="padding:8px 0;">24 saat içinde ders yok.</span>
+                </div>
+            </div>
+            <div id="lesson-list"><div class="empty-msg">Henüz planlanmış ders yok.</div></div>
+        </div>
+
+        <!-- TAMAMLANAN DERSLER -->
+        <div id="tab-completed" class="tab-content">
+            <div class="section-header"><h2>Tamamlanan Dersler</h2></div>
+            <div id="completed-list"><div class="empty-msg">Henüz tamamlanmış ders yok.</div></div>
+        </div>
+
+        <!-- ÖDEME TAKİBİ -->
+        <div id="tab-payments" class="tab-content">
+            <div class="section-header"><h2>Özet ve Ödeme Durumu</h2></div>
+            <div class="summary-cards" id="summary-cards">
+                <div class="summary-card"><div class="label">Toplam Öğrenci</div><div class="value" id="total-students">0</div></div>
+                <div class="summary-card"><div class="label">Toplam Ders</div><div class="value" id="total-lessons">0</div></div>
+                <div class="summary-card clickable" id="debt-card" onclick="showDebtorsModal()">
+                    <div class="label">Toplam Alacak</div>
+                    <div class="value negative" id="total-debt">0 ₺</div>
+                </div>
+                <div class="summary-card"><div class="label">Toplam Tahsilat</div><div class="value positive" id="total-paid">0 ₺</div></div>
+            </div>
+            <h3 style="margin:12px 0 10px;">Öğrenci Bazlı Durum</h3>
+            <div id="student-payment-table"></div>
+        </div>
+
+        <!-- ===== AYLIK KAZANÇ BÖLÜMÜ ===== -->
+        <div id="tab-earnings" class="tab-content">
+            <div class="section-header">
+                <h2>💵 Aylık Kazanç</h2>
+                <button class="btn btn-gold btn-sm" onclick="refreshEarnings()">🔄 Yenile</button>
+            </div>
+
+            <!-- Özet Kartları -->
+            <div class="earnings-summary" id="earnings-summary">
+                <div class="card">
+                    <div class="label">Seçilen Ay</div>
+                    <div class="value blue" id="selected-month">-</div>
+                </div>
+                <div class="card">
+                    <div class="label">Toplam Kazanç</div>
+                    <div class="value gold" id="monthly-total">0 ₺</div>
+                </div>
+                <div class="card">
+                    <div class="label">Tamamlanan Ders</div>
+                    <div class="value green" id="monthly-lessons">0</div>
+                </div>
+                <div class="card">
+                    <div class="label">Ödenmeyen Alacak</div>
+                    <div class="value red" id="monthly-debt">0 ₺</div>
+                </div>
+                <div class="card">
+                    <div class="label">Tahsil Edilen</div>
+                    <div class="value green" id="monthly-collected">0 ₺</div>
+                </div>
+            </div>
+
+            <!-- Ay Seçici -->
+            <div class="month-selector">
+                <label style="font-weight:600; font-size:13px; color:#4a5568;">📆 Ay Seç:</label>
+                <select id="month-select" onchange="renderEarnings()">
+                    <option value="0">Bu Ay</option>
+                    <option value="1">Geçen Ay</option>
+                    <option value="2">2 Ay Önce</option>
+                    <option value="3">3 Ay Önce</option>
+                    <option value="4">4 Ay Önce</option>
+                    <option value="5">5 Ay Önce</option>
+                    <option value="6">6 Ay Önce</option>
+                    <option value="all">Tüm Zamanlar</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="renderEarnings()">📊 Göster</button>
+                <button class="btn btn-secondary btn-sm" onclick="exportEarningsCSV()">📤 CSV Dışa Aktar</button>
+            </div>
+
+            <!-- Kazanç Grafiği -->
+            <div class="earnings-chart-container">
+                <h4>📈 Aylık Kazanç Grafiği</h4>
+                <canvas id="earningsChart"></canvas>
+            </div>
+
+            <!-- Öğrenci Bazlı Kazanç Tablosu -->
+            <h3 style="margin:12px 0 10px;">👨‍🎓 Öğrenci Bazlı Kazanç</h3>
+            <div id="student-earnings-table"></div>
+        </div>
+
+        <!-- DENEME SINAVLARI -->
+        <div id="tab-exams" class="tab-content">
+            <div class="section-header"><h2>Deneme Sınavları – Gelişim Takibi</h2></div>
+            <div class="exam-form">
+                <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+                    <div class="form-group" style="flex:1; min-width:150px;">
+                        <label>Öğrenci *</label>
+                        <select id="exam-student-select"><option value="">Seçiniz</option></select>
+                    </div>
+                    <div class="form-group" style="flex:1; min-width:120px;">
+                        <label>Sınav Türü *</label>
+                        <select id="exam-type-select">
+                            <option value="tyt">TYT</option>
+                            <option value="ayt">AYT</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1; min-width:130px;">
+                        <label>Tarih</label>
+                        <input type="date" id="exam-date">
+                    </div>
+                </div>
+                <div id="exam-subjects-container" class="exam-subjects"></div>
+                <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <button class="btn btn-primary" onclick="saveExam()">💾 Kaydet</button>
+                    <span id="exam-total-net" style="font-weight:600; font-size:15px; margin-left:8px;">Toplam Net: 0</span>
+                </div>
+            </div>
+            <div style="margin-top:20px;">
+                <h3>Geçmiş Denemeler</h3>
+                <div id="exam-list"><div class="empty-msg">Öğrenci seçin veya henüz deneme yok.</div></div>
+                <div class="exam-chart-container" id="exam-chart-container">
+                    <h4>Gelişim Grafiği (Toplam Net)</h4>
+                    <canvas id="examChart"></canvas>
+                    <div class="share-btn-area">
+                        <button class="btn btn-purple" onclick="analyzeStudent()">🧠 Gelişmiş Analiz Et</button>
+                    </div>
+                    <div id="analysis-result" style="display:none;" class="analysis-box">
+                        <h4>📋 Analiz Raporu</h4>
+                        <p id="analysis-text"></p>
+                        <div class="share-btn">
+                            <button class="btn btn-success btn-sm" onclick="shareAnalysis()">📤 Raporu Paylaş</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KARŞILAŞTIR -->
+        <div id="tab-compare" class="tab-content">
+            <div class="section-header"><h2>Öğrenci Karşılaştırma</h2></div>
+            <div class="compare-select-area">
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                    <label>Öğrenci 1:</label>
+                    <select id="compare-student1" onchange="renderCompare()"><option value="">Seçiniz</option></select>
+                    <label>Öğrenci 2:</label>
+                    <select id="compare-student2" onchange="renderCompare()"><option value="">Seçiniz</option></select>
+                    <label>Öğrenci 3:</label>
+                    <select id="compare-student3" onchange="renderCompare()"><option value="">Seçiniz</option></select>
+                </div>
+                <button class="btn btn-primary" onclick="renderCompare()">🔄 Karşılaştır</button>
+            </div>
+            <div id="compare-result"><div class="empty-msg">Karşılaştırmak için öğrencileri seçin.</div></div>
+        </div>
+    </div>
+
+    <!-- MODALLAR -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal-content">
+            <h3 id="modal-title">Form</h3>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="student-lessons-modal">
+        <div class="modal" style="max-width:700px;">
+            <h3 id="student-lessons-title">Öğrenci Dersleri</h3>
+            <div id="student-lessons-body" class="student-lesson-list"></div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeStudentLessonsModal()">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="debtors-modal">
+        <div class="modal">
+            <h3>💰 Borçlu Öğrenciler</h3>
+            <div id="debtors-list" style="margin-bottom:16px;"></div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeDebtorsModal()">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  VERİ YÖNETİMİ
+        // ============================================================
+        let students = [];
+        let lessons = [];
+        let exams = [];
+        let editingStudentId = null;
+        let editingLessonId = null;
+        let examChartInstance = null;
+        let compareChartInstance = null;
+        let earningsChartInstance = null;
+        let lastAnalysis = '';
+        let notificationPermission = false;
+        let notificationInterval = null;
+
+        const STORAGE_STUDENTS = 'math_tutor_students';
+        const STORAGE_LESSONS = 'math_tutor_lessons';
+        const STORAGE_EXAMS = 'math_tutor_exams';
+
+        function loadData() {
+            try {
+                students = JSON.parse(localStorage.getItem(STORAGE_STUDENTS)) || [];
+                lessons = JSON.parse(localStorage.getItem(STORAGE_LESSONS)) || [];
+                lessons = lessons.map(l => ({ ...l, completed: l.completed || false, paid: l.paid || false, duration: l.duration || 75 }));
+                exams = JSON.parse(localStorage.getItem(STORAGE_EXAMS)) || [];
+                students = students.map(s => ({ ...s, class: s.class || '' }));
+            } catch(e) { students = []; lessons = []; exams = []; }
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_STUDENTS, JSON.stringify(students));
+            localStorage.setItem(STORAGE_LESSONS, JSON.stringify(lessons));
+            localStorage.setItem(STORAGE_EXAMS, JSON.stringify(exams));
+        }
+
+        // ============================================================
+        //  YARDIMCILAR
+        // ============================================================
+        function getStudentName(id) {
+            const s = students.find(st => st.id === id);
+            return s ? s.name + ' ' + s.surname : '(Silinmiş)';
+        }
+
+        function getStudentOptions(selectedId) {
+            let opts = '<option value="">Seçiniz</option>';
+            students.forEach(s => {
+                const sel = (s.id === selectedId) ? 'selected' : '';
+                opts += `<option value="${s.id}" ${sel}>${s.name} ${s.surname}</option>`;
+            });
+            return opts;
+        }
+
+        function generateId() { return Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
+        function formatDate(dateStr) { if (!dateStr) return '-'; const d = new Date(dateStr + 'T00:00:00'); return d.toLocaleDateString('tr-TR'); }
+        function formatCurrency(amount) { return Number(amount).toFixed(0) + ' ₺'; }
+        function addMonths(dateStr, months) { const d = new Date(dateStr + 'T00:00:00'); d.setMonth(d.getMonth() + months); const year = d.getFullYear(); const month = String(d.getMonth() + 1).padStart(2,'0'); const day = String(d.getDate()).padStart(2,'0'); return `${year}-${month}-${day}`; }
+        function getStudentDebt(studentId) { const studentLessons = lessons.filter(l => l.studentId === studentId); let count=0, total=0; studentLessons.forEach(l => { if (l.completed && !l.paid) { count++; total += (l.fee || 0); } }); return { count, total }; }
+        function formatPhoneForWhatsApp(phone) { if (!phone) return null; let cleaned = phone.replace(/\D/g,''); if (cleaned.length === 0) return null; if (cleaned.startsWith('0')) cleaned = cleaned.substring(1); if (!cleaned.startsWith('90')) cleaned = '90' + cleaned; if (cleaned.length < 10) return null; return cleaned; }
+        function calculateNet(correct, wrong) { const c = parseInt(correct) || 0; const w = parseInt(wrong) || 0; return c - (w / 4); }
+        function getClassOrder(cls) { if (!cls) return 99; const num = parseInt(cls); if (!isNaN(num) && num >= 5 && num <= 12) return num - 5; if (cls.toLowerCase() === 'mezun') return 8; return 99; }
+
+        // ============================================================
+        //  SIRALAMA
+        // ============================================================
+        let currentSort = 'name-asc';
+        function applySort() { const sortVal = document.getElementById('sort-select').value; currentSort = sortVal; renderStudents(); }
+        function getSortedStudents() {
+            const sortVal = currentSort;
+            let sorted = [...students];
+            if (sortVal === 'name-asc') { sorted.sort((a,b) => (a.name + a.surname).localeCompare(b.name + b.surname)); }
+            else if (sortVal === 'name-desc') { sorted.sort((a,b) => (b.name + b.surname).localeCompare(a.name + a.surname)); }
+            else if (sortVal === 'class-asc') { sorted.sort((a,b) => { const ca = getClassOrder(a.class); const cb = getClassOrder(b.class); if (ca !== cb) return ca - cb; return (a.name + a.surname).localeCompare(b.name + b.surname); }); }
+            else if (sortVal === 'class-desc') { sorted.sort((a,b) => { const ca = getClassOrder(a.class); const cb = getClassOrder(b.class); if (ca !== cb) return cb - ca; return (a.name + a.surname).localeCompare(b.name + b.surname); }); }
+            return sorted;
+        }
+
+        // ============================================================
+        //  ÇAKIŞMA KONTROLÜ
+        // ============================================================
+        function hasConflict(date, time, duration, excludeLessonId) {
+            const dur = parseInt(duration) || 75;
+            const [h, m] = time.split(':').map(Number);
+            const startMin = h * 60 + m;
+            const endMin = startMin + dur;
+            const sameDayLessons = lessons.filter(l => l.date === date && l.id !== (excludeLessonId || '') && l.time);
+            for (let l of sameDayLessons) {
+                const [lh, lm] = l.time.split(':').map(Number);
+                const lStart = lh * 60 + lm;
+                const lDur = parseInt(l.duration) || 75;
+                const lEnd = lStart + lDur;
+                if (startMin < lEnd && endMin > lStart) return true;
+            }
+            return false;
+        }
+
+        // ============================================================
+        //  SEKME GEÇİŞİ
+        // ============================================================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const target = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+                renderAll();
+            });
+        });
+
+        // ============================================================
+        //  MODAL (Ana)
+        // ============================================================
+        function openModal(html, title) { document.getElementById('modal-title').textContent = title || 'Form'; document.getElementById('modal-body').innerHTML = html; document.getElementById('modal-overlay').classList.add('show'); }
+        function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); editingStudentId = null; editingLessonId = null; }
+        document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+        // ============================================================
+        //  ÖĞRENCİ DERSLERİ MODALI
+        // ============================================================
+        function openStudentLessonsModal(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) return;
+            document.getElementById('student-lessons-title').textContent = `${student.name} ${student.surname} - Tüm Dersleri`;
+            const container = document.getElementById('student-lessons-body');
+            const studentLessons = lessons.filter(l => l.studentId === studentId);
+            if (!studentLessons.length) { container.innerHTML = '<div class="empty-msg">Bu öğrenciye ait ders bulunmuyor.</div>'; }
+            else {
+                let html = `<div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Saat</th><th>Süre</th><th>Konu</th><th>Ücret</th><th>Durum</th><th>Ödeme</th></tr></thead><tbody>`;
+                const sorted = [...studentLessons].sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
+                sorted.forEach(l => {
+                    const completed = l.completed || false;
+                    const paid = l.paid || false;
+                    const statusBadge = completed ? '<span class="badge badge-completed">✅ Tamamlandı</span>' : '<span class="badge badge-planned">📌 Planlandı</span>';
+                    const paymentBadge = paid ? '<span class="badge badge-paid">Ödendi</span>' : '<span class="badge badge-unpaid">Ödenmedi</span>';
+                    html += `<tr><td>${formatDate(l.date)}</td><td>${l.time || '-'}</td><td>${l.duration || '-'}</td><td>${l.subject || '-'}</td><td>${l.fee ? formatCurrency(l.fee) : '-'}</td><td>${statusBadge}</td><td>${paymentBadge}</td></tr>`;
+                });
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            }
+            document.getElementById('student-lessons-modal').classList.add('show');
+        }
+        function closeStudentLessonsModal() { document.getElementById('student-lessons-modal').classList.remove('show'); }
+        document.getElementById('student-lessons-modal').addEventListener('click', function(e) { if (e.target === this) closeStudentLessonsModal(); });
+
+        // ============================================================
+        //  BORÇLU ÖĞRENCİLER MODALI
+        // ============================================================
+        function showDebtorsModal() {
+            const container = document.getElementById('debtors-list');
+            const debtors = students.filter(s => { const debt = getStudentDebt(s.id); return debt.count > 0; });
+            if (!debtors.length) { container.innerHTML = '<div class="empty-msg">Borçlu öğrenci bulunmuyor.</div>'; }
+            else {
+                let html = `<div class="table-wrap"><table><thead><tr><th>Öğrenci</th><th>Borç Miktarı</th><th>Borçlu Ders Sayısı</th><th>İşlem</th></tr></thead><tbody>`;
+                debtors.forEach(s => {
+                    const debt = getStudentDebt(s.id);
+                    html += `<tr><td><strong>${s.name} ${s.surname}</strong></td><td>${formatCurrency(debt.total)}</td><td>${debt.count}</td><td><button class="btn btn-success btn-sm" onclick="payAllDebts('${s.id}')">💳 Tümünü Ödendi</button></td></tr>`;
+                });
+                html += '</tbody></table></div>';
+                container.innerHTML = html;
+            }
+            document.getElementById('debtors-modal').classList.add('show');
+        }
+        function payAllDebts(studentId) {
+            if (!confirm('Bu öğrencinin tüm borçlarını ödendi olarak işaretlemek istediğinize emin misiniz?')) return;
+            const studentLessons = lessons.filter(l => l.studentId === studentId);
+            let updated = false;
+            studentLessons.forEach(l => { if (l.completed && !l.paid) { l.paid = true; updated = true; } });
+            if (updated) { saveData(); showDebtorsModal(); renderAll(); } else { alert('Bu öğrencinin ödenmemiş borcu bulunmuyor.'); }
+        }
+        function closeDebtorsModal() { document.getElementById('debtors-modal').classList.remove('show'); }
+        document.getElementById('debtors-modal').addEventListener('click', function(e) { if (e.target === this) closeDebtorsModal(); });
+
+        // ============================================================
+        //  ÖĞRENCİ İŞLEMLERİ
+        // ============================================================
+        function renderStudents() {
+            const container = document.getElementById('student-list');
+            const sorted = getSortedStudents();
+            if (!sorted.length) { container.innerHTML = '<div class="empty-msg">Henüz öğrenci eklenmemiş.</div>'; return; }
+            let html = `<div class="table-wrap"><table><thead><tr><th>Ad Soyad</th><th>Sınıf</th><th>Telefon</th><th>E-posta</th><th>Not</th><th>İşlemler</th></tr></thead><tbody>`;
+            sorted.forEach(s => {
+                const debt = getStudentDebt(s.id);
+                const rowClass = debt.count > 0 ? 'has-debt' : 'no-debt';
+                let phoneLink = '';
+                const waNumber = formatPhoneForWhatsApp(s.phone);
+                if (waNumber) { phoneLink = `<a href="https://wa.me/${waNumber}" target="_blank" class="whatsapp-link" title="WhatsApp ile mesaj gönder"><span class="wa-icon">📱</span> ${s.phone}</a>`; } else { phoneLink = s.phone || '-'; }
+                html += `<tr class="${rowClass}"><td><strong>${s.name} ${s.surname}</strong></td><td>${s.class || '-'}</td><td>${phoneLink}</td><td>${s.email || '-'}</td><td>${s.note || '-'}</td><td class="inline-flex"><button class="btn btn-secondary btn-sm" onclick="openStudentLessonsModal('${s.id}')">📅 Dersler</button><button class="btn btn-warning btn-sm" onclick="editStudent('${s.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')">🗑️</button><button class="btn btn-success btn-sm" onclick="sendWhatsApp('${s.id}')">📱 Bildir</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function openStudentModal(studentId) {
+            const isEdit = !!studentId;
+            const s = isEdit ? students.find(st => st.id === studentId) : null;
+            const title = isEdit ? 'Öğrenci Düzenle' : 'Yeni Öğrenci';
+            const classOptions = ['', '5', '6', '7', '8', '9', '10', '11', '12', 'mezun', 'diğer'];
+            let classHtml = '<select id="f-student-class" onchange="toggleClassInput()">';
+            classOptions.forEach(c => {
+                const sel = (s?.class === c) ? 'selected' : '';
+                const label = c === '' ? 'Seçiniz' : c === 'mezun' ? 'Mezun' : c === 'diğer' ? 'Diğer (Manuel)' : c + '. Sınıf';
+                classHtml += `<option value="${c}" ${sel}>${label}</option>`;
+            });
+            classHtml += '</select>';
+            const showOther = (s?.class && !['', '5','6','7','8','9','10','11','12','mezun'].includes(s.class)) ? 'block' : 'none';
+            classHtml += `<div id="class-other-input" style="margin-top:6px; display:${showOther};"><input type="text" id="f-student-class-other" placeholder="Sınıf girin" value="${(s?.class && !['', '5','6','7','8','9','10','11','12','mezun'].includes(s.class)) ? s.class : ''}" style="width:100%; padding:6px 10px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px;"></div>`;
+            const html = `<div class="form-group"><label>Ad</label><input type="text" id="f-student-name" value="${s?.name||''}" placeholder="Ad"></div><div class="form-group"><label>Soyad</label><input type="text" id="f-student-surname" value="${s?.surname||''}" placeholder="Soyad"></div><div class="form-group"><label>Sınıf</label>${classHtml}</div><div class="form-group"><label>Telefon</label><input type="text" id="f-student-phone" value="${s?.phone||''}" placeholder="Telefon (örn: 05XX XXX XX XX)"></div><div class="form-group"><label>E-posta</label><input type="email" id="f-student-email" value="${s?.email||''}" placeholder="E-posta"></div><div class="form-group"><label>Not</label><input type="text" id="f-student-note" value="${s?.note||''}" placeholder="Not"></div><div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">İptal</button><button class="btn btn-primary" onclick="saveStudent('${isEdit ? studentId : ''}')">Kaydet</button></div>`;
+            editingStudentId = isEdit ? studentId : null;
+            openModal(html, title);
+            setTimeout(toggleClassInput, 100);
+        }
+        function toggleClassInput() { const select = document.getElementById('f-student-class'); const otherInput = document.getElementById('class-other-input'); if (select && otherInput) { if (select.value === 'diğer') { otherInput.style.display = 'block'; } else { otherInput.style.display = 'none'; } } }
+        function saveStudent(studentId) {
+            const name = document.getElementById('f-student-name').value.trim();
+            const surname = document.getElementById('f-student-surname').value.trim();
+            if (!name || !surname) { alert('Ad ve soyad zorunludur.'); return; }
+            let cls = document.getElementById('f-student-class').value;
+            if (cls === 'diğer') { cls = document.getElementById('f-student-class-other').value.trim() || ''; }
+            const phone = document.getElementById('f-student-phone').value.trim();
+            const email = document.getElementById('f-student-email').value.trim();
+            const note = document.getElementById('f-student-note').value.trim();
+            if (studentId) { const idx = students.findIndex(s => s.id === studentId); if (idx !== -1) students[idx] = { ...students[idx], name, surname, class: cls, phone, email, note }; }
+            else { students.push({ id: generateId(), name, surname, class: cls, phone, email, note }); }
+            saveData(); closeModal(); renderAll();
+        }
+        function editStudent(id) { openStudentModal(id); }
+        function deleteStudent(id) {
+            if (!confirm('Bu öğrenciyi silmek istediğinize emin misiniz?')) return;
+            students = students.filter(s => s.id !== id);
+            lessons = lessons.filter(l => l.studentId !== id);
+            exams = exams.filter(e => e.studentId !== id);
+            saveData(); renderAll();
+        }
+
+        // ============================================================
+        //  DERS İŞLEMLERİ
+        // ============================================================
+        function renderLessons() { renderUpcoming24h(); renderPlannedLessonsTable(); }
+        function renderUpcoming24h() {
+            const now = new Date();
+            const next24Limit = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const next24 = lessons.filter(l => !l.completed && l.date && l.time).filter(l => { const d = new Date(l.date + 'T' + (l.time || '00:00')); return d >= now && d <= next24Limit; }).sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
+            const container = document.getElementById('upcoming-24h');
+            if (!next24.length) { container.innerHTML = '<span class="empty-msg" style="padding:8px 0;">24 saat içinde ders yok.</span>'; }
+            else {
+                let html = '';
+                next24.forEach(l => {
+                    const student = getStudentName(l.studentId);
+                    const dateStr = formatDate(l.date);
+                    html += `<span class="upcoming-item" onclick="editLesson('${l.id}')">⏰ ${dateStr} ${l.time} – <strong>${student}</strong> (${l.subject || 'Ders'})</span>`;
+                });
+                container.innerHTML = html;
+            }
+        }
+        function renderPlannedLessonsTable() {
+            const container = document.getElementById('lesson-list');
+            const planned = lessons.filter(l => !l.completed);
+            if (!planned.length) { container.innerHTML = '<div class="empty-msg">Henüz planlanmış ders yok.</div>'; return; }
+            const sorted = [...planned].sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
+            let html = `<div class="table-wrap"><table><thead><tr><th>Öğrenci</th><th>Tarih</th><th>Saat</th><th>Süre</th><th>Konu</th><th>Ücret</th><th>Durum</th><th>Ödeme</th><th>İşlemler</th></tr></thead><tbody>`;
+            sorted.forEach(l => {
+                const paid = l.paid || false;
+                const statusBadge = '<span class="badge badge-planned">📌 Planlandı</span>';
+                const paymentBadge = paid ? '<span class="badge badge-paid">Ödendi</span>' : '<span class="badge badge-unpaid">Ödenmedi</span>';
+                html += `<tr><td><strong>${getStudentName(l.studentId)}</strong></td><td>${formatDate(l.date)}</td><td>${l.time || '-'}</td><td>${l.duration || '-'}</td><td>${l.subject || '-'}</td><td>${l.fee ? formatCurrency(l.fee) : '-'}</td><td>${statusBadge}</td><td>${paymentBadge}</td><td class="inline-flex"><button class="btn btn-success btn-sm" onclick="toggleComplete('${l.id}')">✅ Tamamla</button><button class="btn btn-${paid ? 'danger' : 'success'} btn-sm" onclick="togglePayment('${l.id}')">${paid ? '💳 İptal' : '💳 Ödendi'}</button><button class="btn btn-warning btn-sm" onclick="editLesson('${l.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteLesson('${l.id}')">🗑️</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  WHATSAPP İLE BİLDİRİM - APK UYUMLU (WebView)
+        // ============================================================
+        function sendWhatsApp(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (!student) {
+                alert('Öğrenci bulunamadı.');
+                return;
+            }
+
+            const phone = student.phone;
+            const waNumber = formatPhoneForWhatsApp(phone);
+            if (!waNumber) {
+                alert('Öğrencinin geçerli bir telefon numarası yok.');
+                return;
+            }
+
+            const plannedLessons = lessons.filter(l => l.studentId === studentId && !l.completed)
+                .sort((a, b) => {
+                    if (a.date !== b.date) return a.date.localeCompare(b.date);
+                    return (a.time || '00:00').localeCompare(b.time || '00:00');
+                });
+
+            if (plannedLessons.length === 0) {
+                alert('Bu öğrenciye ait planlanmış ders bulunmuyor.');
+                return;
+            }
+
+            let message = `🔔 Merhaba ${student.name},\n\n`;
+
+            if (plannedLessons.length === 1) {
+                const l = plannedLessons[0];
+                const dateStr = formatDate(l.date);
+                const timeStr = l.time || 'belirtilmedi';
+                const subjectStr = l.subject || 'Ders';
+                message += `📚 Dersiniz planlandı:\n📅 Tarih: ${dateStr}\n⏰ Saat: ${timeStr}\n📖 Konu: ${subjectStr}`;
+            } else {
+                message += `📚 Toplam ${plannedLessons.length} dersiniz planlandı:\n\n`;
+                plannedLessons.forEach((l, index) => {
+                    const dateStr = formatDate(l.date);
+                    const timeStr = l.time || 'belirtilmedi';
+                    const subjectStr = l.subject || 'Ders';
+                    const num = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'][index] || `${index+1}.`;
+                    message += `${num} 📅 ${dateStr} ⏰ ${timeStr} 📖 ${subjectStr}\n`;
+                });
+            }
+
+            message += `\n✅ Görüşmek üzere! 🚀`;
+
+            const encodedMessage = encodeURIComponent(message);
+            
+            // 1. YÖNTEM: WhatsApp Web (En güvenilir - WebView'de çalışır)
+            const url1 = `https://wa.me/${waNumber}?text=${encodedMessage}`;
+            
+            // 2. YÖNTEM: Intent (APK için yedek)
+            const url2 = `intent://send/${waNumber}?text=${encodedMessage}#Intent;package=com.whatsapp;scheme=whatsapp;end`;
+            
+            // 3. YÖNTEM: whatsapp:// (Son çare)
+            const url3 = `whatsapp://send?phone=${waNumber}&text=${encodedMessage}`;
+
+            // Önce Web yöntemini dene (window.open ile)
+            try {
+                const win = window.open(url1, '_blank');
+                // Pop-up engellendiyse veya kapanırsa intent dene
+                if (!win || win.closed) {
+                    window.location.href = url2;
+                }
+            } catch(e) {
+                try {
+                    window.location.href = url2;
+                } catch(e2) {
+                    window.location.href = url3;
+                }
+            }
+        }
+
+        // ============================================================
+        //  TAMAMLANAN DERSLER
+        // ============================================================
+        function renderCompleted() {
+            const container = document.getElementById('completed-list');
+            const completedLessons = lessons.filter(l => l.completed);
+            if (!completedLessons.length) { container.innerHTML = '<div class="empty-msg">Henüz tamamlanmış ders yok.</div>'; return; }
+            const sorted = [...completedLessons].sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
+            let html = `<div class="table-wrap"><table><thead><tr><th>Öğrenci</th><th>Tarih</th><th>Saat</th><th>Süre</th><th>Konu</th><th>Ücret</th><th>Ödeme</th><th>İşlem</th></tr></thead><tbody>`;
+            sorted.forEach(l => {
+                const paid = l.paid || false;
+                const paymentBadge = paid ? '<span class="badge badge-paid">Ödendi</span>' : '<span class="badge badge-unpaid">Ödenmedi</span>';
+                const rowClass = paid ? 'paid-lesson' : 'unpaid-lesson';
+                html += `<tr class="${rowClass}"><td><strong>${getStudentName(l.studentId)}</strong></td><td>${formatDate(l.date)}</td><td>${l.time || '-'}</td><td>${l.duration || '-'}</td><td>${l.subject || '-'}</td><td>${l.fee ? formatCurrency(l.fee) : '-'}</td><td>${paymentBadge}</td><td><button class="btn btn-${paid ? 'danger' : 'success'} btn-sm" onclick="togglePayment('${l.id}')">${paid ? '💳 İptal' : '💳 Ödendi'}</button></td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  DERS EKLE/DÜZENLE
+        // ============================================================
+        function openLessonModal(lessonId) {
+            const isEdit = !!lessonId;
+            const l = isEdit ? lessons.find(ls => ls.id === lessonId) : null;
+            const title = isEdit ? 'Ders Düzenle' : 'Yeni Ders Planla';
+            const repeatChecked = (isEdit && l?.repeat) ? 'checked' : '';
+            const repeatCount = (isEdit && l?.repeatCount) ? l.repeatCount : 1;
+            const html = `<div class="form-group"><label>Öğrenci *</label><select id="f-lesson-student">${getStudentOptions(l?.studentId || '')}</select></div><div class="form-group"><label>Tarih *</label><input type="date" id="f-lesson-date" value="${l?.date || ''}"></div><div class="form-group"><label>Saat *</label><input type="time" id="f-lesson-time" value="${l?.time || ''}"></div><div class="form-group"><label>Süre (dk) *</label><input type="number" id="f-lesson-duration" value="${l?.duration || 75}" placeholder="75"></div><div class="form-group"><label>Konu</label><input type="text" id="f-lesson-subject" value="${l?.subject || ''}" placeholder="Konu"></div><div class="form-group"><label>Ücret (₺)</label><input type="number" id="f-lesson-fee" value="${l?.fee || ''}" placeholder="0"></div><div class="form-group" style="flex-direction:row; gap:16px; align-items:center; flex-wrap:wrap;"><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" id="f-lesson-completed" ${l?.completed ? 'checked' : ''}> Tamamlandı</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" id="f-lesson-paid" ${l?.paid ? 'checked' : ''}> Ödendi</label>${!isEdit ? `<label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" id="f-lesson-repeat" ${repeatChecked}> Her ay tekrarla</label><div style="display:flex;align-items:center;gap:4px;"><label style="font-weight:normal;">Tekrar sayısı:</label><input type="number" id="f-lesson-repeat-count" value="${repeatCount}" min="1" max="24" style="width:60px;"></div>` : ''}</div><div class="form-actions"><button class="btn btn-outline" onclick="closeModal()">İptal</button><button class="btn btn-primary" onclick="saveLesson('${isEdit ? lessonId : ''}')">Kaydet</button></div>`;
+            editingLessonId = isEdit ? lessonId : null;
+            openModal(html, title);
+        }
+        function saveLesson(lessonId) {
+            const studentId = document.getElementById('f-lesson-student').value;
+            const date = document.getElementById('f-lesson-date').value;
+            const time = document.getElementById('f-lesson-time').value;
+            const duration = parseInt(document.getElementById('f-lesson-duration').value) || 75;
+            const subject = document.getElementById('f-lesson-subject').value.trim();
+            const fee = parseFloat(document.getElementById('f-lesson-fee').value) || 0;
+            const completed = document.getElementById('f-lesson-completed').checked;
+            const paid = document.getElementById('f-lesson-paid').checked;
+            const repeat = document.getElementById('f-lesson-repeat')?.checked || false;
+            const repeatCount = parseInt(document.getElementById('f-lesson-repeat-count')?.value) || 1;
+            if (!studentId) { alert('Lütfen bir öğrenci seçin.'); return; }
+            if (!date) { alert('Lütfen tarih girin.'); return; }
+            if (!time) { alert('Lütfen saat girin.'); return; }
+            if (duration < 1) { alert('Süre en az 1 dakika olmalıdır.'); return; }
+            if (lessonId) {
+                if (hasConflict(date, time, duration, lessonId)) { alert(`Bu saat diliminde (${time} - ${time} + ${duration} dk) başka bir ders var. Lütfen farklı bir saat seçin.`); return; }
+                const idx = lessons.findIndex(l => l.id === lessonId);
+                if (idx !== -1) { lessons[idx] = { ...lessons[idx], studentId, date, time, duration, subject, fee, completed, paid }; }
+                saveData(); closeModal(); renderAll(); return;
+            }
+            if (repeat && repeatCount > 0) {
+                let currentDate = date;
+                for (let i = 0; i < repeatCount; i++) {
+                    if (hasConflict(currentDate, time, duration, null)) { alert(`Tekrarlı dersler oluşturulurken ${formatDate(currentDate)} tarihinde çakışma oluştu. Lütfen farklı bir başlangıç tarihi veya saat seçin.`); return; }
+                    lessons.push({ id: generateId(), studentId, date: currentDate, time, duration, subject, fee, completed: false, paid: false, repeat: true, repeatCount: repeatCount });
+                    if (i < repeatCount - 1) { currentDate = addMonths(currentDate, 1); }
+                }
+                saveData(); closeModal(); renderAll();
+            } else {
+                if (hasConflict(date, time, duration, null)) { alert(`Bu saat diliminde (${time} - ${time} + ${duration} dk) başka bir ders var. Lütfen farklı bir saat seçin.`); return; }
+                lessons.push({ id: generateId(), studentId, date, time, duration, subject, fee, completed, paid, repeat: false });
+                saveData(); closeModal(); renderAll();
+            }
+        }
+        function editLesson(id) { openLessonModal(id); }
+        function deleteLesson(id) { if (!confirm('Bu dersi silmek istediğinize emin misiniz?')) return; lessons = lessons.filter(l => l.id !== id); saveData(); renderAll(); }
+        function toggleComplete(id) { const l = lessons.find(ls => ls.id === id); if (!l) return; l.completed = !l.completed; saveData(); renderAll(); }
+        function togglePayment(id) { const l = lessons.find(ls => ls.id === id); if (!l) return; l.paid = !l.paid; saveData(); renderAll(); }
+
+        // ============================================================
+        //  ÖDEME TAKİBİ
+        // ============================================================
+        function renderPayments() {
+            document.getElementById('total-students').textContent = students.length;
+            document.getElementById('total-lessons').textContent = lessons.length;
+            let totalDebt = 0, totalPaid = 0;
+            lessons.forEach(l => { const fee = l.fee || 0; if (l.paid) { totalPaid += fee; } else if (l.completed) { totalDebt += fee; } });
+            document.getElementById('total-debt').textContent = formatCurrency(totalDebt);
+            document.getElementById('total-paid').textContent = formatCurrency(totalPaid);
+            const container = document.getElementById('student-payment-table');
+            if (!students.length) { container.innerHTML = '<div class="empty-msg">Öğrenci bulunmuyor.</div>'; return; }
+            let html = `<div class="table-wrap"><table><thead><tr><th>Öğrenci</th><th>Toplam Ders</th><th>Tamamlanan</th><th>Ödenen (Tahsilat)</th><th>Alacak (Tamamlanmış-Ödenmemiş)</th><th>Toplam Ücret</th></tr></thead><tbody>`;
+            students.forEach(s => {
+                const sl = lessons.filter(l => l.studentId === s.id);
+                const total = sl.length;
+                let completedCount = 0, paidCount = 0, paidSum = 0, debtCount = 0, debtSum = 0, totalFee = 0;
+                sl.forEach(l => { const fee = l.fee || 0; totalFee += fee; if (l.completed) completedCount++; if (l.paid) { paidCount++; paidSum += fee; } else if (l.completed) { debtCount++; debtSum += fee; } });
+                const rowClass = debtCount > 0 ? 'has-debt' : 'no-debt';
+                html += `<tr class="${rowClass}"><td><strong>${s.name} ${s.surname}</strong></td><td>${total}</td><td>${completedCount}</td><td>${paidCount} (${formatCurrency(paidSum)})</td><td>${debtCount} (${formatCurrency(debtSum)})</td><td>${formatCurrency(totalFee)}</td></tr>`;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  AYLIK KAZANÇ BÖLÜMÜ
+        // ============================================================
+        function getMonthRange(monthOffset) {
+            const now = new Date();
+            let year = now.getFullYear();
+            let month = now.getMonth() - monthOffset;
+            
+            if (month < 0) {
+                month += 12;
+                year--;
+            }
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            return {
+                year,
+                month,
+                monthName: firstDay.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' }),
+                firstDay: firstDay.toISOString().slice(0, 10),
+                lastDay: lastDay.toISOString().slice(0, 10)
+            };
+        }
+
+        function getLessonsForMonth(monthOffset) {
+            const range = getMonthRange(monthOffset);
+            
+            return lessons.filter(l => {
+                if (!l.date) return false;
+                return l.date >= range.firstDay && l.date <= range.lastDay;
+            });
+        }
+
+        function renderEarnings() {
+            const monthSelect = document.getElementById('month-select');
+            const selectedValue = monthSelect.value;
+            
+            let lessonsForMonth = [];
+            let monthName = '';
+            
+            if (selectedValue === 'all') {
+                // Tüm zamanlar
+                lessonsForMonth = lessons.filter(l => l.completed);
+                monthName = 'Tüm Zamanlar';
+            } else {
+                const offset = parseInt(selectedValue);
+                const range = getMonthRange(offset);
+                lessonsForMonth = getLessonsForMonth(offset);
+                monthName = range.monthName;
+            }
+            
+            // Sadece tamamlanmış dersleri al
+            const completedLessons = lessonsForMonth.filter(l => l.completed);
+            
+            // Toplam kazanç
+            let totalEarnings = 0;
+            let totalCollected = 0;
+            let totalDebt = 0;
+            
+            completedLessons.forEach(l => {
+                const fee = l.fee || 0;
+                totalEarnings += fee;
+                if (l.paid) {
+                    totalCollected += fee;
+                } else {
+                    totalDebt += fee;
+                }
+            });
+            
+            // Özet kartlarını güncelle
+            document.getElementById('selected-month').textContent = monthName;
+            document.getElementById('monthly-total').textContent = formatCurrency(totalEarnings);
+            document.getElementById('monthly-lessons').textContent = completedLessons.length;
+            document.getElementById('monthly-debt').textContent = formatCurrency(totalDebt);
+            document.getElementById('monthly-collected').textContent = formatCurrency(totalCollected);
+            
+            // Öğrenci bazlı kazanç tablosu
+            renderStudentEarningsTable(completedLessons);
+            
+            // Grafiği güncelle
+            renderEarningsChart(selectedValue);
+        }
+
+        function renderStudentEarningsTable(completedLessons) {
+            const container = document.getElementById('student-earnings-table');
+            
+            if (completedLessons.length === 0) {
+                container.innerHTML = '<div class="empty-msg">Bu dönemde tamamlanmış ders bulunmuyor.</div>';
+                return;
+            }
+            
+            // Öğrenci bazında toplama
+            const studentEarnings = {};
+            completedLessons.forEach(l => {
+                const studentId = l.studentId;
+                if (!studentEarnings[studentId]) {
+                    studentEarnings[studentId] = {
+                        total: 0,
+                        count: 0,
+                        paid: 0,
+                        debt: 0
+                    };
+                }
+                const fee = l.fee || 0;
+                studentEarnings[studentId].total += fee;
+                studentEarnings[studentId].count++;
+                if (l.paid) {
+                    studentEarnings[studentId].paid += fee;
+                } else {
+                    studentEarnings[studentId].debt += fee;
+                }
+            });
+            
+            let html = `<div class="table-wrap"><table>
+                <thead><tr>
+                    <th>Öğrenci</th>
+                    <th>Ders Sayısı</th>
+                    <th>Toplam Ücret</th>
+                    <th>Tahsil Edilen</th>
+                    <th>Alacak</th>
+                    <th>Durum</th>
+                </tr></thead><tbody>`;
+            
+            // Toplam kazanca göre sırala (büyükten küçüğe)
+            const sortedStudents = Object.keys(studentEarnings).sort((a, b) => {
+                return studentEarnings[b].total - studentEarnings[a].total;
+            });
+            
+            sortedStudents.forEach(studentId => {
+                const data = studentEarnings[studentId];
+                const student = students.find(s => s.id === studentId);
+                const name = student ? `${student.name} ${student.surname}` : '(Silinmiş)';
+                const rowClass = data.debt > 0 ? 'has-debt' : 'no-debt';
+                
+                html += `<tr class="${rowClass}">
+                    <td><strong>${name}</strong></td>
+                    <td>${data.count}</td>
+                    <td>${formatCurrency(data.total)}</td>
+                    <td>${formatCurrency(data.paid)}</td>
+                    <td>${formatCurrency(data.debt)}</td>
+                    <td>${data.debt > 0 ? '<span class="badge badge-unpaid">Borçlu</span>' : '<span class="badge badge-paid">Ödendi</span>'}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function renderEarningsChart(selectedValue) {
+            const ctx = document.getElementById('earningsChart').getContext('2d');
+            
+            // Son 6 ayın verilerini al
+            const months = [];
+            const earnings = [];
+            const lessonCounts = [];
+            
+            const startMonth = selectedValue === 'all' ? 5 : 5;
+            
+            for (let i = startMonth; i >= 0; i--) {
+                const range = getMonthRange(i);
+                const lessonsForMonth = getLessonsForMonth(i).filter(l => l.completed);
+                const totalEarnings = lessonsForMonth.reduce((sum, l) => sum + (l.fee || 0), 0);
+                
+                months.push(range.monthName);
+                earnings.push(totalEarnings);
+                lessonCounts.push(lessonsForMonth.length);
+            }
+            
+            if (earningsChartInstance) {
+                earningsChartInstance.destroy();
+                earningsChartInstance = null;
+            }
+            
+            if (earnings.every(e => e === 0)) {
+                // Hiç veri yoksa boş grafik göster
+                earningsChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'Kazanç (₺)',
+                                data: earnings,
+                                backgroundColor: 'rgba(214, 158, 46, 0.6)',
+                                borderColor: '#d69e2e',
+                                borderWidth: 2,
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: true, position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(0) + ' ₺';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Kazanç (₺)' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Ay' }
+                            }
+                        }
+                    }
+                });
+                return;
+            }
+            
+            earningsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Kazanç (₺)',
+                            data: earnings,
+                            backgroundColor: 'rgba(214, 158, 46, 0.7)',
+                            borderColor: '#d69e2e',
+                            borderWidth: 2,
+                            order: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Ders Sayısı',
+                            data: lessonCounts,
+                            type: 'line',
+                            backgroundColor: 'rgba(74, 144, 217, 0.1)',
+                            borderColor: '#4a90d9',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#4a90d9',
+                            tension: 0.3,
+                            fill: false,
+                            order: 0,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    if (ctx.dataset.label === 'Kazanç (₺)') {
+                                        return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(0) + ' ₺';
+                                    }
+                                    return ctx.dataset.label + ': ' + ctx.parsed.y + ' ders';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            position: 'left',
+                            title: { display: true, text: 'Kazanç (₺)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: { display: true, text: 'Ders Sayısı' },
+                            grid: { drawOnChartArea: false }
+                        },
+                        x: {
+                            title: { display: true, text: 'Ay' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshEarnings() {
+            renderEarnings();
+        }
+
+        function exportEarningsCSV() {
+            const monthSelect = document.getElementById('month-select');
+            const selectedValue = monthSelect.value;
+            
+            let lessonsForMonth = [];
+            let monthName = '';
+            
+            if (selectedValue === 'all') {
+                lessonsForMonth = lessons.filter(l => l.completed);
+                monthName = 'Tüm Zamanlar';
+            } else {
+                const offset = parseInt(selectedValue);
+                lessonsForMonth = getLessonsForMonth(offset).filter(l => l.completed);
+                monthName = getMonthRange(offset).monthName;
+            }
+            
+            if (lessonsForMonth.length === 0) {
+                alert('Bu dönemde veri yok.');
+                return;
+            }
+            
+            let csv = 'Öğrenci,Tarih,Saat,Konu,Ücret,Ödeme Durumu\n';
+            lessonsForMonth.forEach(l => {
+                const student = students.find(s => s.id === l.studentId);
+                const name = student ? `${student.name} ${student.surname}` : '(Silinmiş)';
+                const status = l.paid ? 'Ödendi' : 'Ödenmedi';
+                csv += `"${name}","${formatDate(l.date)}","${l.time || '-'}","${l.subject || 'Ders'}",${l.fee || 0},"${status}"\n`;
+            });
+            
+            // CSV dosyasını indir
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `kazanc_${monthName.replace(/ /g, '_')}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ============================================================
+        //  DENEME SINAVLARI
+        // ============================================================
+        function renderExams() {
+            const select = document.getElementById('exam-student-select');
+            const currentVal = select.value;
+            select.innerHTML = getStudentOptions(currentVal);
+            const dateInput = document.getElementById('exam-date');
+            if (!dateInput.value) { dateInput.value = new Date().toISOString().slice(0, 10); }
+            updateExamSubjects();
+            const studentId = select.value;
+            if (studentId) { renderExamList(studentId); renderExamChart(studentId); } else { document.getElementById('exam-list').innerHTML = '<div class="empty-msg">Öğrenci seçin.</div>'; if (examChartInstance) { examChartInstance.destroy(); examChartInstance = null; } document.getElementById('exam-total-net').textContent = 'Toplam Net: 0'; document.getElementById('analysis-result').style.display = 'none'; }
+        }
+        function updateExamSubjects() {
+            const type = document.getElementById('exam-type-select').value;
+            const container = document.getElementById('exam-subjects-container');
+            let html = '';
+            const subjects = type === 'tyt' ? [{key:'turkce',label:'Türkçe'},{key:'sosyal',label:'Sosyal'},{key:'matematik',label:'Matematik'},{key:'fen',label:'Fen'}] : [{key:'matematik',label:'Matematik'},{key:'fizik',label:'Fizik'},{key:'kimya',label:'Kimya'},{key:'biyoloji',label:'Biyoloji'}];
+            subjects.forEach(s => { html += `<div class="subject-group"><h4>${s.label}</h4><div class="input-row"><label>D</label><input type="number" min="0" class="exam-correct" data-subject="${s.key}" placeholder="0"><label>Y</label><input type="number" min="0" class="exam-wrong" data-subject="${s.key}" placeholder="0"></div><div class="net-display" id="net-${s.key}">Net: 0.00</div></div>`; });
+            container.innerHTML = html;
+            container.querySelectorAll('input').forEach(inp => {
+                inp.addEventListener('input', function() {
+                    const subject = this.dataset.subject;
+                    const group = this.closest('.subject-group');
+                    const correct = group.querySelector('.exam-correct').value || 0;
+                    const wrong = group.querySelector('.exam-wrong').value || 0;
+                    const net = calculateNet(correct, wrong);
+                    group.querySelector('.net-display').textContent = `Net: ${net.toFixed(2)}`;
+                    calculateTotalNet();
+                });
+            });
+            calculateTotalNet();
+        }
+        function calculateTotalNet() {
+            const corrects = document.querySelectorAll('.exam-correct');
+            const wrongs = document.querySelectorAll('.exam-wrong');
+            let totalNet = 0;
+            for (let i = 0; i < corrects.length; i++) { const c = parseInt(corrects[i].value) || 0; const w = parseInt(wrongs[i].value) || 0; totalNet += calculateNet(c, w); }
+            document.getElementById('exam-total-net').textContent = `Toplam Net: ${totalNet.toFixed(2)}`;
+            return totalNet;
+        }
+        function saveExam() {
+            const studentId = document.getElementById('exam-student-select').value;
+            const type = document.getElementById('exam-type-select').value;
+            const date = document.getElementById('exam-date').value;
+            if (!studentId) { alert('Lütfen bir öğrenci seçin.'); return; }
+            if (!date) { alert('Lütfen tarih seçin.'); return; }
+            const subjects = {};
+            const corrects = document.querySelectorAll('.exam-correct');
+            const wrongs = document.querySelectorAll('.exam-wrong');
+            for (let i = 0; i < corrects.length; i++) {
+                const key = corrects[i].dataset.subject;
+                const c = parseInt(corrects[i].value) || 0;
+                const w = parseInt(wrongs[i].value) || 0;
+                subjects[key] = { correct: c, wrong: w };
+            }
+            const newExam = { id: generateId(), studentId, date, type, subjects };
+            exams.push(newExam);
+            saveData();
+            renderExams();
+            alert('Deneme kaydedildi!');
+        }
+        function renderExamList(studentId) {
+            const container = document.getElementById('exam-list');
+            const studentExams = exams.filter(e => e.studentId === studentId).sort((a,b) => a.date.localeCompare(b.date));
+            if (!studentExams.length) { container.innerHTML = '<div class="empty-msg">Bu öğrenciye ait deneme yok.</div>'; return; }
+            let html = `<div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Tür</th>`;
+            const subjectKeys = Object.keys(studentExams[0].subjects);
+            subjectKeys.forEach(k => { const label = k.charAt(0).toUpperCase() + k.slice(1); html += `<th>${label} Net</th>`; });
+            html += `<th>Toplam Net</th></tr></thead><tbody>`;
+            studentExams.forEach(exam => {
+                const subjects = exam.subjects;
+                let totalNet = 0;
+                let row = `<tr><td>${formatDate(exam.date)}</td><td>${exam.type.toUpperCase()}</td>`;
+                subjectKeys.forEach(k => {
+                    const s = subjects[k] || { correct: 0, wrong: 0 };
+                    const net = calculateNet(s.correct, s.wrong);
+                    totalNet += net;
+                    row += `<td>${net.toFixed(2)}</td>`;
+                });
+                row += `<td><strong>${totalNet.toFixed(2)}</strong></td></tr>`;
+                html += row;
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+        function renderExamChart(studentId) {
+            const ctx = document.getElementById('examChart').getContext('2d');
+            const studentExams = exams.filter(e => e.studentId === studentId).sort((a,b) => a.date.localeCompare(b.date));
+            if (examChartInstance) { examChartInstance.destroy(); examChartInstance = null; }
+            if (!studentExams.length) { return; }
+            const labels = studentExams.map(e => formatDate(e.date));
+            const data = studentExams.map(e => {
+                let total = 0;
+                const subjects = e.subjects;
+                Object.keys(subjects).forEach(k => { const s = subjects[k]; total += calculateNet(s.correct, s.wrong); });
+                return total;
+            });
+            examChartInstance = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'Toplam Net', data, borderColor: '#4a90d9', backgroundColor: 'rgba(74,144,217,0.1)', tension: 0.2, fill: true, pointBackgroundColor: '#4a90d9' }] }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: true, position: 'top' } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Net' } }, x: { title: { display: true, text: 'Tarih' } } } } });
+        }
+
+        // ============================================================
+        //  YEREL YAPAY ZEKA (KURAL TABANLI AKILLI YORUM)
+        // ============================================================
+        function generateLocalAIComment(studentName, stats) {
+            const { totalExams, avgNet, trend, worstSubject, worstAvg, bestSubject, bestAvg, change } = stats;
+            let comment = '', advice = '', motivation = '';
+            if (change > 0) { motivation = `🎯 Tebrikler ${studentName}! Başlangıca göre netlerinde artış var (${change.toFixed(1)} net). Bu ivmeyi koru, hedefine emin adımlarla ilerliyorsun.`; } else if (change < 0) { motivation = `💪 Pes etme ${studentName}! Her inişin bir çıkışı vardır. Bu düşüş seni daha güçlü yapacak, eksiklerini görüp çalışmaya devam et.`; } else { motivation = `🧘 Sakin ol ${studentName}, her şey yolunda. Bazen netler durağan olabilir, bu normal. Denemeye devam, sonuçlar gelecektir.`; }
+            let trendComment = '';
+            if (trend === 'yükseliş') { trendComment = 'Son dönemde netlerin yükselişte, bu çok olumlu. Bu tempoyu koruyarak zor konulara geçiş yapabilirsin.'; } else if (trend === 'düşüş') { trendComment = 'Son denemelerde düşüş görülüyor. Endişelenme, bu bir uyarı. Eksik konuları belirleyip tekrar etmelisin.'; } else { trendComment = 'Netlerin durağan seyrediyor. Farklı kaynaklardan soru çözümü veya deneme sıklığını artırmak faydalı olabilir.'; }
+            let subjectAdvice = '';
+            if (worstAvg < 2) { subjectAdvice = `📌 ${worstSubject} dersinde ortalama netin çok düşük (${worstAvg.toFixed(1)}). Bu derse özel ek çalışma yapmalısın. Konu tekrarları ve bol soru çözümü ile toparlayabilirsin.`; } else if (worstAvg < 5) { subjectAdvice = `📌 ${worstSubject} dersinde ortalama netin ${worstAvg.toFixed(1)}. Bu dersi geliştirmek için haftada 2-3 saat ek çalışma ayırabilirsin.`; } else { subjectAdvice = `📌 En zayıf dersin ${worstSubject} (${worstAvg.toFixed(1)} net). Mevcut seviyeni koru, ama biraz daha zaman ayırarak ilerletebilirsin.`; }
+            if (bestAvg > 8) { subjectAdvice += ` 💪 ${bestSubject} dersinde çok iyisin (${bestAvg.toFixed(1)} net), bu başarını koru!`; }
+            if (avgNet < 10) { advice = '📊 Genel net ortalaman düşük. Temel konulara dönüp eksiklerini tamamlaman faydalı olacak. Günde 1 saat düzenli çalışma ile büyük ilerleme kaydedebilirsin.'; } else if (avgNet < 20) { advice = '📈 Orta seviyedesin. Orta-zor sorulara yönelerek netlerini artırabilirsin. Branş denemeleri ile hızını ve doğruluğunu geliştir.'; } else { advice = '🌟 İyi bir seviyedesin. Artık zor sorulara ve deneme sınavlarına odaklanarak sınav tecrübeni artırabilirsin.'; }
+            comment = `${motivation}\n\n🧠 Trend Analizi: ${trendComment}\n\n${subjectAdvice}\n\n💡 Öneri: ${advice}`;
+            return comment;
+        }
+
+        // ============================================================
+        //  ANALİZ (Yerel Yapay Zeka ile)
+        // ============================================================
+        function analyzeStudent() {
+            const studentId = document.getElementById('exam-student-select').value;
+            if (!studentId) { alert('Lütfen önce bir öğrenci seçin.'); return; }
+            const studentExams = exams.filter(e => e.studentId === studentId).sort((a,b) => a.date.localeCompare(b.date));
+            if (studentExams.length < 2) {
+                document.getElementById('analysis-text').textContent = '📌 Yeterli veri yok. En az 2 deneme sonucu gereklidir.\n\nEğitim Asistanı olarak daha sağlıklı bir analiz yapabilmem için en az iki deneme sonucuna ihtiyacım var. Lütfen öğrencinin deneme sonuçlarını girin, ardından tekrar analiz yapalım.';
+                document.getElementById('analysis-result').style.display = 'block';
+                return;
+            }
+            const nets = studentExams.map(e => { let total = 0; Object.keys(e.subjects).forEach(k => { const s = e.subjects[k]; total += calculateNet(s.correct, s.wrong); }); return total; });
+            const totalExams = nets.length;
+            const avgNet = nets.reduce((a,b) => a + b, 0) / totalExams;
+            const maxNet = Math.max(...nets);
+            const minNet = Math.min(...nets);
+            const last3 = nets.slice(-3);
+            const avgLast3 = last3.reduce((a,b) => a + b, 0) / last3.length;
+            const firstNet = nets[0];
+            const lastNet = nets[nets.length - 1];
+            const change = lastNet - firstNet;
+            const changePercent = (change / (firstNet || 1)) * 100;
+            let trend = 'durağan';
+            let trendEmoji = '➖';
+            if (nets.length >= 3) { const recentTrend = last3[2] - last3[0]; if (recentTrend > 1.5) { trend = 'yükseliş'; trendEmoji = '📈'; } else if (recentTrend < -1.5) { trend = 'düşüş'; trendEmoji = '📉'; } } else if (change > 1.5) { trend = 'yükseliş'; trendEmoji = '📈'; } else if (change < -1.5) { trend = 'düşüş'; trendEmoji = '📉'; }
+            const subjectKeys = Object.keys(studentExams[0].subjects);
+            const subjectStats = {};
+            subjectKeys.forEach(k => {
+                const subjectNets = studentExams.map(e => { const s = e.subjects[k] || { correct: 0, wrong: 0 }; return calculateNet(s.correct, s.wrong); });
+                const avg = subjectNets.reduce((a,b) => a + b, 0) / subjectNets.length;
+                const first = subjectNets[0];
+                const last = subjectNets[subjectNets.length - 1];
+                const chg = last - first;
+                let tr = 'durağan';
+                if (chg > 1) tr = 'yükseliş';
+                else if (chg < -1) tr = 'düşüş';
+                subjectStats[k] = { avg, first, last, chg, trend: tr };
+            });
+            const sortedSubjects = [...subjectKeys].sort((a,b) => subjectStats[b].avg - subjectStats[a].avg);
+            const bestSubject = sortedSubjects[0];
+            const worstSubject = sortedSubjects[sortedSubjects.length - 1];
+            let suggestions = '';
+            if (trend === 'yükseliş') { suggestions = '🌟 Başarılı bir grafik çiziyorsun. Aynı tempoda devam et! Zor konulara geçiş yaparak kendini daha da geliştirebilirsin.'; } else if (trend === 'düşüş') { suggestions = '🔍 Son denemelerde düşüş var. Endişelenme, bu normal. Eksik konuları tespit edip haftalık hedef programı hazırlayalım.'; } else { suggestions = '📊 Netlerin durağan seyrediyor. Farklı kaynaklardan soru çözümü veya deneme sıklığını artırmak faydalı olabilir.'; }
+            const worstAvg = subjectStats[worstSubject].avg;
+            if (worstAvg < 2) { suggestions += `\n📌 ${worstSubject.charAt(0).toUpperCase() + worstSubject.slice(1)} dersinde ortalama netin çok düşük. Bu derse özel ek çalışma yapmalısın.`; }
+            if (subjectStats[bestSubject].avg > 8) { suggestions += `\n💪 ${bestSubject.charAt(0).toUpperCase() + bestSubject.slice(1)} dersinde çok iyisin, bu başarını koru!`; }
+            let motivation = '';
+            if (change > 0) { motivation = '🎯 Tebrikler! Başlangıca göre netlerinde artış var. Bu ivmeyi koru, hedefine emin adımlarla ilerliyorsun.'; } else if (change < 0) { motivation = '💪 Pes etme! Her inişin bir çıkışı vardır. Bu düşüş seni daha güçlü yapacak, eksiklerini görüp çalışmaya devam et.'; } else { motivation = '🧘 Sakin ol, her şey yolunda. Bazen netler durağan olabilir, bu normal. Denemeye devam, sonuçlar gelecektir.'; }
+            const studentName = getStudentName(studentId);
+            let report = `📊 ${studentName} - Gelişmiş Analiz Raporu\n==========================================\n\n📌 Genel İstatistikler:\n   • Toplam Deneme: ${totalExams}\n   • Ortalama Net: ${avgNet.toFixed(2)}\n   • En Yüksek Net: ${maxNet.toFixed(2)}\n   • En Düşük Net: ${minNet.toFixed(2)}\n   • Son 3 Deneme Ortalaması: ${avgLast3.toFixed(2)}\n   • Genel Trend: ${trendEmoji} ${trend.charAt(0).toUpperCase() + trend.slice(1)}\n   • Başlangıç Neti: ${firstNet.toFixed(2)} → Güncel Net: ${lastNet.toFixed(2)} (${change > 0 ? '+' : ''}${change.toFixed(2)} net, ${changePercent.toFixed(1)}%)\n\n📚 Ders Bazında Analiz:\n`;
+            subjectKeys.forEach(k => {
+                const s = subjectStats[k];
+                const trEmoji = s.chg > 1 ? '📈' : s.chg < -1 ? '📉' : '➖';
+                report += `   • ${k.charAt(0).toUpperCase() + k.slice(1)}: Ort. ${s.avg.toFixed(2)} net, Başlangıç ${s.first.toFixed(2)} → Güncel ${s.last.toFixed(2)} (${s.chg > 0 ? '+' : ''}${s.chg.toFixed(2)} net) ${trEmoji}\n`;
+            });
+            report += `   • En Güçlü Ders: ${bestSubject.charAt(0).toUpperCase() + bestSubject.slice(1)} (${subjectStats[bestSubject].avg.toFixed(2)} net)\n   • En Zayıf Ders: ${worstSubject.charAt(0).toUpperCase() + worstSubject.slice(1)} (${subjectStats[worstSubject].avg.toFixed(2)} net)\n\n🧠 Yorum:\n   ${motivation}\n\n💡 Kişiselleştirilmiş Öneri:\n   ${suggestions}\n\n`;
+            const aiStats = { totalExams, avgNet, trend, worstSubject: worstSubject.charAt(0).toUpperCase() + worstSubject.slice(1), worstAvg: subjectStats[worstSubject].avg, bestSubject: bestSubject.charAt(0).toUpperCase() + bestSubject.slice(1), bestAvg: subjectStats[bestSubject].avg, subjectStats, change, changePercent };
+            const localAIComment = generateLocalAIComment(studentName, aiStats);
+            report += `\n🤖 Yerel Yapay Zeka Yorumu:\n${localAIComment}\n\n==========================================\n✨ Başarılar dilerim! Eğitim Asistanı`;
+            lastAnalysis = report;
+            document.getElementById('analysis-text').textContent = report;
+            document.getElementById('analysis-result').style.display = 'block';
+        }
+        function shareAnalysis() {
+            if (!lastAnalysis) { alert('Önce analiz yapın.'); return; }
+            if (navigator.share) {
+                navigator.share({ title: 'Eğitim Asistanı - Analiz Raporu', text: lastAnalysis }).catch(err => { if (err.name !== 'AbortError') { alert('Paylaşım başarısız oldu. Metni kopyalayabilirsiniz.'); } });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = lastAnalysis;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try { document.execCommand('copy'); alert('✅ Analiz metni panoya kopyalandı.'); } catch(e) { alert('Kopyalama başarısız. Metni manuel olarak kopyalayın.'); }
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // ============================================================
+        //  KARŞILAŞTIRMA (RAPOR FORMATINDA)
+        // ============================================================
+        function renderCompare() {
+            const sid1 = document.getElementById('compare-student1').value;
+            const sid2 = document.getElementById('compare-student2').value;
+            const sid3 = document.getElementById('compare-student3').value;
+            const selectedIds = [sid1, sid2, sid3].filter(id => id);
+            if (selectedIds.length < 2) { document.getElementById('compare-result').innerHTML = '<div class="empty-msg">En az 2 öğrenci seçin.</div>'; if (compareChartInstance) { compareChartInstance.destroy(); compareChartInstance = null; } return; }
+            const studentData = [];
+            selectedIds.forEach(id => {
+                const studentExams = exams.filter(e => e.studentId === id).sort((a,b) => b.date.localeCompare(a.date));
+                if (studentExams.length === 0) { studentData.push({ id, name: getStudentName(id), subjects: null }); } else { const latest = studentExams[0]; studentData.push({ id, name: getStudentName(id), subjects: latest.subjects, type: latest.type, date: latest.date }); }
+            });
+            const hasData = studentData.filter(d => d.subjects !== null);
+            if (hasData.length < 2) { document.getElementById('compare-result').innerHTML = '<div class="empty-msg">Seçilen öğrencilerden en az 2\'sinin denemesi olmalı.</div>'; if (compareChartInstance) { compareChartInstance.destroy(); compareChartInstance = null; } return; }
+            const types = hasData.map(d => d.type);
+            const allSameType = types.every(t => t === types[0]);
+            if (!allSameType) { document.getElementById('compare-result').innerHTML = '<div class="empty-msg">Öğrencilerin denemeleri aynı türde olmalı (TYT veya AYT).</div>'; if (compareChartInstance) { compareChartInstance.destroy(); compareChartInstance = null; } return; }
+            const subjectKeys = Object.keys(hasData[0].subjects);
+            const labels = subjectKeys.map(k => k.charAt(0).toUpperCase() + k.slice(1));
+            const colors = ['#4a90d9', '#38a169', '#e53e3e', '#d69e2e', '#8b5cf6', '#ed64a6'];
+            let html = `<div class="compare-report"><div class="report-header"><h3>📊 Karşılaştırma Raporu</h3><span>${formatDate(new Date().toISOString().slice(0,10))}</span></div><table><thead><tr><th>Öğrenci</th><th>Sınıf</th>`;
+            labels.forEach(l => html += `<th>${l}</th>`);
+            html += `<th>Toplam Net</th></tr></thead><tbody>`;
+            const datasets = [];
+            studentData.forEach((d, idx) => {
+                if (!d.subjects) { html += `<tr><td><strong>${d.name}</strong></td><td colspan="${labels.length+2}" style="color:#a0aec0;">Deneme bulunamadı</td></tr>`; return; }
+                const student = students.find(s => s.id === d.id);
+                const cls = student ? student.class || '-' : '-';
+                const totals = [];
+                let total = 0;
+                subjectKeys.forEach(k => { const s = d.subjects[k] || { correct: 0, wrong: 0 }; const net = calculateNet(s.correct, s.wrong); totals.push(net); total += net; });
+                html += `<tr><td><strong>${d.name}</strong></td><td>${cls}</td>`;
+                totals.forEach(t => html += `<td>${t.toFixed(2)}</td>`);
+                html += `<td><strong>${total.toFixed(2)}</strong></td></tr>`;
+                datasets.push({ label: d.name, data: totals, borderColor: colors[idx % colors.length], backgroundColor: colors[idx % colors.length] + '33' });
+            });
+            html += `</tbody></table><div class="compare-chart-container"><h4>📈 Ders Bazında Karşılaştırma</h4><canvas id="compareChart"></canvas></div></div>`;
+            document.getElementById('compare-result').innerHTML = html;
+            const chartCtx = document.getElementById('compareChart').getContext('2d');
+            if (compareChartInstance) { compareChartInstance.destroy(); compareChartInstance = null; }
+            compareChartInstance = new Chart(chartCtx, { type: 'bar', data: { labels: labels, datasets: datasets.map(d => ({ label: d.label, data: d.data, backgroundColor: d.backgroundColor, borderColor: d.borderColor, borderWidth: 2 })) }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2) + ' net'; } } } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Net' } }, x: { title: { display: true, text: 'Dersler' } } } } });
+        }
+
+        // ============================================================
+        //  BİLDİRİM SİSTEMİ
+        // ============================================================
+        function checkNotificationPermission() {
+            if (!('Notification' in window)) { document.getElementById('notification-banner').style.display = 'none'; return false; }
+            if (Notification.permission === 'granted') { notificationPermission = true; document.getElementById('notification-banner').style.display = 'flex'; document.getElementById('banner-text').textContent = '🔔 Bildirimler aktif!'; document.querySelector('#notification-banner .actions .btn-primary').style.display = 'none'; return true; }
+            else if (Notification.permission === 'denied') { document.getElementById('notification-banner').style.display = 'flex'; document.getElementById('banner-text').textContent = '❌ Bildirimler engellenmiş. Tarayıcı ayarlarından izin verin.'; document.querySelector('#notification-banner .actions .btn-primary').style.display = 'none'; return false; }
+            else { document.getElementById('notification-banner').style.display = 'flex'; document.getElementById('banner-text').textContent = '🔔 Bildirim almak için izin verin!'; document.querySelector('#notification-banner .actions .btn-primary').style.display = 'inline-flex'; return false; }
+        }
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) { alert('Bu tarayıcı bildirimleri desteklemiyor.'); return; }
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') { notificationPermission = true; document.getElementById('banner-text').textContent = '🔔 Bildirimler aktif!'; document.querySelector('#notification-banner .actions .btn-primary').style.display = 'none'; showNotification('✅ Bildirimler Aktif', 'Ders Takip uygulaması bildirim gönderebilir.'); scheduleUpcomingNotifications(); } else { alert('Bildirim izni verilmedi. Ayarlardan değiştirebilirsiniz.'); }
+            });
+        }
+        function showNotification(title, body) {
+            if (!notificationPermission) return;
+            try {
+                const options = { body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="80" fill="%234a90d9"/%3E%3Ctext x="256" y="340" font-size="240" text-anchor="middle" fill="white" font-family="Arial"%3E📚%3C/text%3E%3C/svg%3E', badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="80" fill="%234a90d9"/%3E%3Ctext x="256" y="340" font-size="240" text-anchor="middle" fill="white" font-family="Arial"%3E📚%3C/text%3E%3C/svg%3E', vibrate: [200,100,200], requireInteraction: true };
+                const notification = new Notification(title, options);
+                notification.onclick = function() { window.focus(); this.close(); };
+                setTimeout(() => notification.close(), 30000);
+            } catch(e) { console.warn('Bildirim gönderilemedi:', e); }
+        }
+        function checkAndNotifyUpcomingLessons() {
+            if (!notificationPermission) return;
+            const now = new Date();
+            const next24Limit = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const upcoming = lessons.filter(l => !l.completed && l.date && l.time).filter(l => { const d = new Date(l.date + 'T' + (l.time || '00:00')); return d >= now && d <= next24Limit; }).sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
+            const notified = JSON.parse(localStorage.getItem('notified_lessons') || '[]');
+            const newNotified = [];
+            upcoming.forEach(l => {
+                const key = l.id + '_' + l.date;
+                if (!notified.includes(key)) {
+                    const student = getStudentName(l.studentId);
+                    const dateStr = formatDate(l.date);
+                    const timeStr = l.time || 'belirtilmedi';
+                    const subjectStr = l.subject || 'Ders';
+                    showNotification(`📅 ${student} - ${subjectStr}`, `${dateStr} ${timeStr} - ${student} ile dersiniz var!`);
+                    newNotified.push(key);
+                }
+            });
+            if (newNotified.length > 0) { localStorage.setItem('notified_lessons', JSON.stringify([...notified, ...newNotified])); }
+            const oldNotified = JSON.parse(localStorage.getItem('notified_lessons') || '[]');
+            const validKeys = upcoming.map(l => l.id + '_' + l.date);
+            const filtered = oldNotified.filter(key => validKeys.includes(key));
+            localStorage.setItem('notified_lessons', JSON.stringify(filtered));
+        }
+        function scheduleUpcomingNotifications() {
+            if (notificationInterval) { clearInterval(notificationInterval); }
+            setTimeout(checkAndNotifyUpcomingLessons, 2000);
+            notificationInterval = setInterval(checkAndNotifyUpcomingLessons, 15 * 60 * 1000);
+            setTimeout(() => { notificationInterval = setInterval(checkAndNotifyUpcomingLessons, 60 * 60 * 1000); }, 30 * 60 * 1000);
+            showNotification('⏰ Ders Takip Aktif', 'Yaklaşan dersler için bildirim alacaksınız.');
+        }
+        function isAndroidApp() { return /Android/i.test(navigator.userAgent) && (window.navigator.standalone !== undefined || window.matchMedia('(display-mode: standalone)').matches); }
+
+        // ============================================================
+        //  TÜM EKRANI YENİLE
+        // ============================================================
+        function renderAll() {
+            renderStudents();
+            renderLessons();
+            renderCompleted();
+            renderPayments();
+            
+            // Kazanç sekmesi
+            const earningsTab = document.getElementById('tab-earnings');
+            if (earningsTab.classList.contains('active')) { renderEarnings(); }
+            
+            const examsTab = document.getElementById('tab-exams');
+            if (examsTab.classList.contains('active')) { renderExams(); }
+            
+            const opts = getStudentOptions('');
+            document.getElementById('compare-student1').innerHTML = opts;
+            document.getElementById('compare-student2').innerHTML = opts;
+            document.getElementById('compare-student3').innerHTML = opts;
+            
+            const compareTab = document.getElementById('tab-compare');
+            if (compareTab.classList.contains('active')) { renderCompare(); }
+            
+            checkNotificationPermission();
+        }
+
+        // ============================================================
+        //  BAŞLAT
+        // ============================================================
+        loadData();
+        document.getElementById('sort-select').value = 'name-asc';
+        currentSort = 'name-asc';
+        document.getElementById('exam-type-select').addEventListener('change', updateExamSubjects);
+        document.getElementById('exam-student-select').addEventListener('change', function() {
+            const studentId = this.value;
+            if (studentId) { renderExamList(studentId); renderExamChart(studentId); } else { document.getElementById('exam-list').innerHTML = '<div class="empty-msg">Öğrenci seçin.</div>'; if (examChartInstance) { examChartInstance.destroy(); examChartInstance = null; } }
+            document.getElementById('exam-total-net').textContent = 'Toplam Net: 0';
+            document.getElementById('analysis-result').style.display = 'none';
+        });
+        renderAll();
+        if (isAndroidApp()) { setTimeout(() => { requestNotificationPermission(); }, 3000); }
+        setInterval(() => { if (notificationPermission) { checkAndNotifyUpcomingLessons(); } }, 5 * 60 * 1000);
+        console.log('✅ Ders Takip başlatıldı. (APK modu: ' + isAndroidApp() + ')');
+        console.log('💵 Aylık kazanç bölümü eklendi!');
+    </script>
+</body>
+</html>
