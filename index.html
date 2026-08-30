@@ -1,14 +1,29 @@
+<!--
+MIT License
+
+Copyright (c) 2026 [Adınız Soyadınız]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<link rel="manifest" href="manifest.json">
-
-<meta name="theme-color" content="#2563eb">
-
-<link rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="icons/icon-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#4a90d9">
@@ -18,7 +33,19 @@
     <meta name="application-name" content="Ders Takip">
     <meta name="apple-mobile-web-app-title" content="Ders Takip">
     
-    <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Ders Takip&quot;,&quot;short_name&quot;:&quot;Ders Takip&quot;,&quot;description&quot;:&quot;Öğrenci koçluğu ve ders takip uygulaması&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#f0f2f5&quot;,&quot;theme_color&quot;:&quot;#4a90d9&quot;,&quot;orientation&quot;:&quot;portrait&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%234a90d9'/%3E%3Ctext x='256' y='340' font-size='240' text-anchor='middle' fill='white' font-family='Arial'%3E📚%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%234a90d9'/%3E%3Ctext x='256' y='340' font-size='240' text-anchor='middle' fill='white' font-family='Arial'%3E📚%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;,&quot;purpose&quot;:&quot;any maskable&quot;}]}">
+    <!-- Manifest (External - PWABuilder için) -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    
+    <!-- Microsoft Tile -->
+    <meta name="msapplication-TileColor" content="#4a90d9">
+    <meta name="msapplication-TileImage" content="icons/icon-144.png">
     
     <title>Ders Takip</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
@@ -140,7 +167,7 @@
         /* ===== KAZANÇ BÖLÜMÜ STİLLERİ ===== */
         .earnings-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 16px;
             margin-bottom: 20px;
         }
@@ -206,6 +233,15 @@
         .month-selector .btn-sm {
             padding: 4px 12px;
             font-size: 12px;
+        }
+
+        .footer-license {
+            text-align: center;
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
         }
 
         @media (max-width: 640px) { 
@@ -306,7 +342,6 @@
                 <button class="btn btn-gold btn-sm" onclick="refreshEarnings()">🔄 Yenile</button>
             </div>
 
-            <!-- Özet Kartları -->
             <div class="earnings-summary" id="earnings-summary">
                 <div class="card">
                     <div class="label">Seçilen Ay</div>
@@ -330,7 +365,6 @@
                 </div>
             </div>
 
-            <!-- Ay Seçici -->
             <div class="month-selector">
                 <label style="font-weight:600; font-size:13px; color:#4a5568;">📆 Ay Seç:</label>
                 <select id="month-select" onchange="renderEarnings()">
@@ -347,13 +381,11 @@
                 <button class="btn btn-secondary btn-sm" onclick="exportEarningsCSV()">📤 CSV Dışa Aktar</button>
             </div>
 
-            <!-- Kazanç Grafiği -->
             <div class="earnings-chart-container">
                 <h4>📈 Aylık Kazanç Grafiği</h4>
                 <canvas id="earningsChart"></canvas>
             </div>
 
-            <!-- Öğrenci Bazlı Kazanç Tablosu -->
             <h3 style="margin:12px 0 10px;">👨‍🎓 Öğrenci Bazlı Kazanç</h3>
             <div id="student-earnings-table"></div>
         </div>
@@ -449,6 +481,10 @@
                 <button class="btn btn-outline" onclick="closeDebtorsModal()">Kapat</button>
             </div>
         </div>
+    </div>
+
+    <div class="footer-license">
+        MIT License - 2026 - Açık Kaynak
     </div>
 
     <script>
@@ -937,18 +973,17 @@
             let monthName = '';
             
             if (selectedValue === 'all') {
-                // Tüm zamanlar
                 lessonsForMonth = lessons.filter(l => l.completed);
                 monthName = 'Tüm Zamanlar';
             } else {
                 const offset = parseInt(selectedValue);
                 const range = getMonthRange(offset);
-                lessonsForMonth = getLessonsForMonth(offset);
+                lessonsForMonth = getLessonsForMonth(offset).filter(l => l.completed);
                 monthName = range.monthName;
             }
             
             // Sadece tamamlanmış dersleri al
-            const completedLessons = lessonsForMonth.filter(l => l.completed);
+            const completedLessons = lessonsForMonth;
             
             // Toplam kazanç
             let totalEarnings = 0;
@@ -1070,7 +1105,6 @@
             }
             
             if (earnings.every(e => e === 0)) {
-                // Hiç veri yoksa boş grafik göster
                 earningsChartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1212,7 +1246,6 @@
                 csv += `"${name}","${formatDate(l.date)}","${l.time || '-'}","${l.subject || 'Ders'}",${l.fee || 0},"${status}"\n`;
             });
             
-            // CSV dosyasını indir
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -1567,18 +1600,8 @@
         setInterval(() => { if (notificationPermission) { checkAndNotifyUpcomingLessons(); } }, 5 * 60 * 1000);
         console.log('✅ Ders Takip başlatıldı. (APK modu: ' + isAndroidApp() + ')');
         console.log('💵 Aylık kazanç bölümü eklendi!');
+        console.log('📱 MIT Lisansı ile açık kaynak');
+        console.log('🖼️ PWA iconlar eklendi!');
     </script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-        navigator.serviceWorker.register("./sw.js")
-            .then(function () {
-                console.log("Ders Takip hazır.");
-            })
-            .catch(function (error) {
-                console.log("Service Worker hatası:", error);
-            });
-    });
-}
-</script>
 </body>
 </html>
