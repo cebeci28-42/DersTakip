@@ -33,26 +33,37 @@ SOFTWARE.
     <meta name="application-name" content="Ders Takip">
     <meta name="apple-mobile-web-app-title" content="Ders Takip">
     
-    <!-- Manifest (External - PWABuilder için) -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-    
-    <!-- Microsoft Tile -->
-    <meta name="msapplication-TileColor" content="#4a90d9">
-    <meta name="msapplication-TileImage" content="icons/icon-144.png">
+    <!-- Manifest (Inline - Base64 Icon ile) -->
+    <link rel="manifest" href="data:application/json,{
+        &quot;name&quot;:&quot;Ders Takip&quot;,
+        &quot;short_name&quot;:&quot;Ders Takip&quot;,
+        &quot;description&quot;:&quot;Öğrenci koçluğu ve ders takip uygulaması&quot;,
+        &quot;start_url&quot;:&quot;.&quot;,
+        &quot;display&quot;:&quot;standalone&quot;,
+        &quot;background_color&quot;:&quot;#f0f2f5&quot;,
+        &quot;theme_color&quot;:&quot;#4a90d9&quot;,
+        &quot;orientation&quot;:&quot;portrait&quot;,
+        &quot;icons&quot;:[
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_16]&quot;,&quot;sizes&quot;:&quot;16x16&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_32]&quot;,&quot;sizes&quot;:&quot;32x32&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_64]&quot;,&quot;sizes&quot;:&quot;64x64&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_72]&quot;,&quot;sizes&quot;:&quot;72x72&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_96]&quot;,&quot;sizes&quot;:&quot;96x96&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_128]&quot;,&quot;sizes&quot;:&quot;128x128&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_144]&quot;,&quot;sizes&quot;:&quot;144x144&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_192]&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_256]&quot;,&quot;sizes&quot;:&quot;256x256&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_384]&quot;,&quot;sizes&quot;:&quot;384x384&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;},
+            {&quot;src&quot;:&quot;data:image/png;base64,[BASE64_ICON_512]&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;purpose&quot;:&quot;any maskable&quot;}
+        ]
+    }">
     
     <title>Ders Takip</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
-        /* ===== TÜM STİLLER AYNEN ===== */
+        /* ===== TÜM STİLLER ===== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 16px; color: #333; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
         .container { max-width: 1400px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); padding: 20px 24px; }
@@ -1601,7 +1612,7 @@ SOFTWARE.
         console.log('✅ Ders Takip başlatıldı. (APK modu: ' + isAndroidApp() + ')');
         console.log('💵 Aylık kazanç bölümü eklendi!');
         console.log('📱 MIT Lisansı ile açık kaynak');
-        console.log('🖼️ PWA iconlar eklendi!');
+        console.log('🖼️ PWA iconlar Base64 olarak eklendi!');
     </script>
 </body>
 </html>
