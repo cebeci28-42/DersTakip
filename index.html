@@ -33,13 +33,13 @@ SOFTWARE.
     <meta name="application-name" content="Ders Takip">
     <meta name="apple-mobile-web-app-title" content="Ders Takip">
     
-    <!-- Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <!-- Manifest - DÜZELTİLDİ -->
+    <link rel="manifest" href="./manifest.json">
     
-    <!-- Service Worker -->
+    <!-- Service Worker - DÜZELTİLDİ -->
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
+            navigator.serviceWorker.register('./sw.js')
                 .then(() => console.log('✅ Service Worker kaydedildi'))
                 .catch(err => console.log('❌ Service Worker hatası:', err));
         }
@@ -718,42 +718,6 @@ SOFTWARE.
             lessons = lessons.filter(l => l.studentId !== id);
             exams = exams.filter(e => e.studentId !== id);
             saveData(); renderAll();
-        }
-
-        // ============================================================
-        //  DERS İŞLEMLERİ
-        // ============================================================
-        function renderLessons() { renderUpcoming24h(); renderPlannedLessonsTable(); }
-        function renderUpcoming24h() {
-            const now = new Date();
-            const next24Limit = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-            const next24 = lessons.filter(l => !l.completed && l.date && l.time).filter(l => { const d = new Date(l.date + 'T' + (l.time || '00:00')); return d >= now && d <= next24Limit; }).sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
-            const container = document.getElementById('upcoming-24h');
-            if (!next24.length) { container.innerHTML = '<span class="empty-msg" style="padding:8px 0;">24 saat içinde ders yok.</span>'; }
-            else {
-                let html = '';
-                next24.forEach(l => {
-                    const student = getStudentName(l.studentId);
-                    const dateStr = formatDate(l.date);
-                    html += `<span class="upcoming-item" onclick="editLesson('${l.id}')">⏰ ${dateStr} ${l.time} – <strong>${student}</strong> (${l.subject || 'Ders'})</span>`;
-                });
-                container.innerHTML = html;
-            }
-        }
-        function renderPlannedLessonsTable() {
-            const container = document.getElementById('lesson-list');
-            const planned = lessons.filter(l => !l.completed);
-            if (!planned.length) { container.innerHTML = '<div class="empty-msg">Henüz planlanmış ders yok.</div>'; return; }
-            const sorted = [...planned].sort((a,b) => { const da = new Date(a.date + 'T' + (a.time || '00:00')); const db = new Date(b.date + 'T' + (b.time || '00:00')); return da - db; });
-            let html = `<div class="table-wrap"><table><thead><tr><th>Öğrenci</th><th>Tarih</th><th>Saat</th><th>Süre</th><th>Konu</th><th>Ücret</th><th>Durum</th><th>Ödeme</th><th>İşlemler</th></tr></thead><tbody>`;
-            sorted.forEach(l => {
-                const paid = l.paid || false;
-                const statusBadge = '<span class="badge badge-planned">📌 Planlandı</span>';
-                const paymentBadge = paid ? '<span class="badge badge-paid">Ödendi</span>' : '<span class="badge badge-unpaid">Ödenmedi</span>';
-                html += `<tr><td><strong>${getStudentName(l.studentId)}</strong></td><td>${formatDate(l.date)}</td><td>${l.time || '-'}</td><td>${l.duration || '-'}</td><td>${l.subject || '-'}</td><td>${l.fee ? formatCurrency(l.fee) : '-'}</td><td>${statusBadge}</td><td>${paymentBadge}</td><td class="inline-flex"><button class="btn btn-success btn-sm" onclick="toggleComplete('${l.id}')">✅ Tamamla</button><button class="btn btn-${paid ? 'danger' : 'success'} btn-sm" onclick="togglePayment('${l.id}')">${paid ? '💳 İptal' : '💳 Ödendi'}</button><button class="btn btn-warning btn-sm" onclick="editLesson('${l.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteLesson('${l.id}')">🗑️</button></td></tr>`;
-            });
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
         }
 
         // ============================================================
