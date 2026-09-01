@@ -1,24 +1,26 @@
 const CACHE_NAME = "ders-takip-v1";
 
 const FILES_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icons/icon192.png",   // EKLENDI
-  "/icons/icon512.png"    // EKLENDI
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icons/icon192.png",
+  "./icons/icon512.png"
 ];
 
+// Install Event - Cache dosyalarını kaydeder
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log("Cache açıldı");
+        console.log("Cache başarıyla açıldı");
         return cache.addAll(FILES_TO_CACHE);
       })
       .then(() => self.skipWaiting())
   );
 });
 
+// Activate Event - Eski cache'leri temizler
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -34,6 +36,7 @@ self.addEventListener("activate", event => {
   );
 });
 
+// Fetch Event - Cache'den veya internetten dosyaları getirir
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request)
@@ -41,7 +44,7 @@ self.addEventListener("fetch", event => {
         // Cache'de varsa döndür, yoksa internetten al
         return response || fetch(event.request)
           .then(fetchResponse => {
-            // Sadece başarılı istekleri cache'le
+            // Sadece başarılı yanıtları cache'le
             if (fetchResponse && fetchResponse.status === 200) {
               const responseClone = fetchResponse.clone();
               caches.open(CACHE_NAME).then(cache => {
@@ -51,7 +54,7 @@ self.addEventListener("fetch", event => {
             return fetchResponse;
           })
           .catch(() => {
-            // Offline durumu için alternatif (opsiyonel)
+            // Offline durumu için (opsiyonel)
             console.log("Offline - istek başarısız:", event.request.url);
           });
       })
