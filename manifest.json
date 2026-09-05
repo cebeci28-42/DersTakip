@@ -1,27 +1,23 @@
 {
   "name": "Ders Takip",
-  "short_name": "Ders Takip",
-  "description": "Öğrenci koçluğu ve ders takip uygulaması",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f0f2f5",
+  "short_name": "DersTakip",
+  "description": "Öğrenci ders takip ve kazanç yönetim uygulaması",
+  "start_url": "/index.html",
+  "display": "fullscreen",
+  "background_color": "#4a90d9",
   "theme_color": "#4a90d9",
   "orientation": "portrait",
-  "categories": [
-    "education",
-    "productivity"
-  ],
-  "lang": "tr",
-  "scope": "./",
+  "scope": "/",
+  "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "./icon192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./icon512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
