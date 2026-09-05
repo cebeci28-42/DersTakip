@@ -3,11 +3,9 @@ const CACHE_NAME = 'ders-takip-v3';
 const ASSETS = [
     '/index.html',
     '/',
-    '/widget.html',
-    '/widget.js'
+    '/widget-helper.js'
 ];
 
-// Install event
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -25,7 +23,6 @@ self.addEventListener('install', event => {
     );
 });
 
-// Activate event
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys()
@@ -46,7 +43,6 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Fetch event
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request)
@@ -82,7 +78,7 @@ self.addEventListener('fetch', event => {
     );
 });
 
-// PUSH BİLDİRİM - Widget için
+// Push bildirimleri
 self.addEventListener('push', event => {
     const data = event.data ? event.data.json() : {};
     const title = data.title || '📚 Ders Takip';
@@ -106,7 +102,6 @@ self.addEventListener('push', event => {
     );
 });
 
-// Notification click event
 self.addEventListener('notificationclick', event => {
     event.notification.close();
     
@@ -117,107 +112,17 @@ self.addEventListener('notificationclick', event => {
     }
 });
 
-// Widget'dan gelen mesajları dinle
+// Widget'dan gelen mesajlar
 self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'GET_LESSONS') {
-        // Widget'dan ders bilgisi istendi
-        console.log('📱 Widget ders bilgisi istiyor');
-        
-        // Cache'ten verileri al
+    if (event.data && event.data.type === 'UPDATE_WIDGET') {
+        console.log('📱 Widget verileri güncelleniyor...');
+        // Verileri cache'le
         caches.open(CACHE_NAME).then(cache => {
-            cache.match('/index.html').then(response => {
-                if (response) {
-                    // Ders bilgilerini widget'a gönder
-                    event.ports[0].postMessage({
-                        type: 'LESSONS_DATA',
-                        data: getUpcomingLessons()
-                    });
-                }
-            });
+            const response = new Response(JSON.stringify({
+                lessons: event.data.lessons,
+                students: event.data.students
+            }));
+            cache.put('/widget-data.json', response);
         });
     }
 });
-
-// Yaklaşan dersleri getir
-function getUpcomingLessons() {
-    try {
-        // localStorage'dan dersleri al
-        const storedLessons = localStorage.getItem('math_tutor_lessons');
-        const lessons = storedLessons ? JSON.parse(storedLessons) : [];
-        const storedStudents = localStorage.getItem('math_tutor_students');
-        const students = storedStudents ? JSON.parse(storedStudents) : [];
-        
-        const now = new Date();
-        const next24 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        const next7 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        
-        const upcoming = lessons
-            .filter(l => !l.completed && l.date && l.time)
-            .filter(l => {
-                try {
-                    const d = new Date(l.date + 'T' + (l.time || '00:00'));
-                    return d >= now && d <= next24;
-                } catch(e) { return false; }
-            })
-            .sort((a,b) => {
-                try {
-                    const da = new Date(a.date + 'T' + (a.time || '00:00'));
-                    const db = new Date(b.date + 'T' + (b.time || '00:00'));
-                    return da - db;
-                } catch(e) { return 0; }
-            })
-            .map(l => {
-                const student = students.find(s => s.id === l.studentId);
-                const name = student ? `${student.name} ${student.surname}` : '(Silinmiş)';
-                return {
-                    id: l.id,
-                    studentName: name,
-                    date: formatDate(l.date),
-                    time: l.time || 'belirtilmedi',
-                    subject: l.subject || 'Ders',
-                    fee: l.fee || 0
-                };
-            });
-        
-        return upcoming;
-    } catch(e) {
-        console.warn('Widget ders getirme hatası:', e);
-        return [];
-    }
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return '-';
-    try {
-        const d = new Date(dateStr + 'T00:00:00');
-        if (isNaN(d.getTime())) return dateStr;
-        return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
-    } catch(e) {
-        return dateStr;
-    }
-}
-
-// Periyodik kontrol (arka planda)
-self.addEventListener('periodicsync', event => {
-    if (event.tag === 'check-lessons') {
-        event.waitUntil(checkUpcomingLessons());
-    }
-});
-
-async function checkUpcomingLessons() {
-    try {
-        const lessons = getUpcomingLessons();
-        if (lessons.length > 0) {
-            self.registration.showNotification('⏰ Ders Hatırlatma', {
-                body: `${lessons.length} yaklaşan dersiniz var!`,
-                icon: 'icon-192.png',
-                badge: 'icon-192.png',
-                vibrate: [200, 100, 200],
-                requireInteraction: true,
-                data: { lessons: lessons }
-            });
-        }
-    } catch(e) {
-        console.warn('Periyodik kontrol hatası:', e);
-    }
-}
