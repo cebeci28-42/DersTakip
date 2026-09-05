@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4a90d9">
+    <title>Ders Takip Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: transparent;
+            padding: 8px;
+            min-height: 100vh;
+        }
+        
+        .widget-container {
+            background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+            border-radius: 16px;
+            padding: 12px 14px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(74, 144, 217, 0.4);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .widget-title {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .widget-title span {
+            font-size: 18px;
+        }
+        
+        .widget-refresh {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .widget-refresh:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .widget-refresh:active {
+            transform: scale(0.95);
+        }
+        
+        #widget-lessons {
+            min-height: 50px;
+        }
+        
+        .widget-lesson-item {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .widget-lesson-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(3px);
+        }
+        
+        .widget-lesson-item:active {
+            transform: scale(0.98);
+        }
+        
+        .widget-lesson-time {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 55px;
+            text-align: center;
+        }
+        
+        .widget-lesson-info {
+            flex: 1;
+        }
+        
+        .widget-lesson-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .widget-lesson-subject {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .widget-lesson-fee {
+            background: rgba(255, 215, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ffd700;
+        }
+        
+        .widget-empty {
+            text-align: center;
+            padding: 15px 0;
+            opacity: 0.8;
+        }
+        
+        .widget-empty .widget-emoji {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .widget-empty p {
+            font-size: 12px;
+        }
+        
+        .widget-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 10px;
+            opacity: 0.7;
+        }
+        
+        .widget-footer .widget-count {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+        }
+        
+        .widget-footer .widget-update-time {
+            font-size: 10px;
+        }
+        
+        .widget-notify-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .widget-notify-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .widget-notify-btn:active {
+            transform: scale(0.95);
+        }
+        
+        @media (max-width: 480px) {
+            .widget-container {
+                padding: 10px 12px;
+            }
+            .widget-title {
+                font-size: 12px;
+            }
+            .widget-lesson-item {
+                padding: 6px 10px;
+                gap: 8px;
+            }
+            .widget-lesson-time {
+                font-size: 10px;
+                min-width: 45px;
+                padding: 2px 8px;
+            }
+            .widget-lesson-name {
+                font-size: 12px;
+            }
+            .widget-lesson-subject {
+                font-size: 10px;
+            }
+            .widget-lesson-fee {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <!-- Widget Başlığı -->
+        <div class="widget-header">
+            <div class="widget-title">
+                <span>📚</span> Ders Takip
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <button class="widget-notify-btn" onclick="sendWidgetNotification()">🔔</button>
+                <button class="widget-refresh" onclick="refreshWidget()">🔄</button>
+            </div>
+        </div>
+        
+        <!-- Ders Listesi -->
+        <div id="widget-lessons">
+            <div class="widget-empty">
+                <span class="widget-emoji">⏳</span>
+                <p>Yükleniyor...</p>
+            </div>
+        </div>
+        
+        <!-- Widget Footer -->
+        <div class="widget-footer">
+            <span class="widget-count" id="widget-count">0 ders</span>
+            <span class="widget-update-time" id="widget-update-time">🔄 --:--</span>
+        </div>
+    </div>
+    
+    <script src="widget.js"></script>
+</body>
+</html>

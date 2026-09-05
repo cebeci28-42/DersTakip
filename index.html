@@ -18,10 +18,9 @@
     <!-- Manifest -->
     <link rel="manifest" href="./manifest.json">
     
-    <!-- Service Worker - GÜNCELLENDİ -->
+    <!-- Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
-            // Eski service worker'ları temizle
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for(let registration of registrations) {
                     registration.unregister();
@@ -29,16 +28,14 @@
                 }
             });
             
-            // Yeni service worker'ı kaydet
             navigator.serviceWorker.register('./sw.js')
                 .then(registration => {
                     console.log('✅ Service Worker kaydedildi');
                     registration.update();
                     
-                    // Periyodik senkronizasyon (arka plan)
                     if ('periodicSync' in registration) {
                         registration.periodicSync.register('check-lessons', {
-                            minInterval: 60 * 60 * 1000 // 1 saat
+                            minInterval: 60 * 60 * 1000
                         }).then(() => {
                             console.log('✅ Periyodik senkronizasyon aktif');
                         }).catch(err => {
@@ -51,25 +48,18 @@
                 });
         }
 
-        // Push bildirimleri için abone ol
         async function subscribePush() {
             if (!('Notification' in window)) return;
             if (Notification.permission !== 'granted') return;
             
             try {
                 const registration = await navigator.serviceWorker.ready;
-                const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: null // VAPID anahtarı gerekirse ekleyin
-                });
-                console.log('✅ Push aboneliği aktif:', subscription);
-                localStorage.setItem('push_subscription', JSON.stringify(subscription));
+                console.log('✅ Push bildirimleri hazır');
             } catch(e) {
                 console.warn('Push aboneliği başarısız:', e);
             }
         }
 
-        // Sayfa yüklendiğinde push aboneliğini dene
         if ('serviceWorker' in navigator) {
             setTimeout(subscribePush, 3000);
         }
@@ -96,7 +86,6 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Android ekranına sığma için */
         body { 
             padding: 8px; 
             min-height: 100vh;
@@ -356,21 +345,20 @@
             accent-color: #4a90d9;
         }
 
-        /* Android widget bildirim butonu */
         .widget-notify-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 8px 14px;
             border-radius: 12px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .widget-notify-btn:hover {
             transform: translateY(-2px);
@@ -378,6 +366,60 @@
         }
         .widget-notify-btn:active {
             transform: scale(0.95);
+        }
+
+        /* Widget önizleme */
+        .widget-preview {
+            background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+            border-radius: 16px;
+            padding: 16px;
+            color: white;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(74, 144, 217, 0.3);
+        }
+        .widget-preview .widget-preview-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.9;
+        }
+        .widget-preview .widget-preview-lesson {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .widget-preview .widget-preview-lesson .time {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .widget-preview .widget-preview-lesson .info {
+            flex: 1;
+        }
+        .widget-preview .widget-preview-lesson .info .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .widget-preview .widget-preview-lesson .info .subject {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        .widget-preview .widget-preview-empty {
+            text-align: center;
+            padding: 10px 0;
+            opacity: 0.7;
+            font-size: 13px;
         }
 
         @media (max-width: 640px) { 
@@ -391,13 +433,26 @@
             .earnings-summary .card .value { font-size: 18px; }
             .summary-card .value { font-size: 18px; }
             .summary-card { padding: 10px 12px; min-width: 80px; }
-            .widget-notify-btn { padding: 8px 14px; font-size: 12px; }
+            .widget-notify-btn { padding: 6px 12px; font-size: 11px; }
+            .widget-preview { padding: 12px; }
+            .widget-preview .widget-preview-lesson { padding: 6px 10px; gap: 8px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>✒️ Ders Takip</h1>
+
+        <!-- Widget Önizleme -->
+        <div class="widget-preview" id="widget-preview">
+            <div class="widget-preview-title">
+                📱 Widget Önizleme
+                <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:white;margin-left:auto;" onclick="refreshWidgetPreview()">🔄</button>
+            </div>
+            <div id="widget-preview-content">
+                <div class="widget-preview-empty">⏳ Yükleniyor...</div>
+            </div>
+        </div>
 
         <div id="notification-banner" class="notification-banner">
             <div class="msg">
@@ -686,6 +741,8 @@
                 localStorage.setItem(STORAGE_STUDENTS, JSON.stringify(students));
                 localStorage.setItem(STORAGE_LESSONS, JSON.stringify(lessons));
                 localStorage.setItem(STORAGE_EXAMS, JSON.stringify(exams));
+                // Widget'ı güncelle
+                refreshWidgetPreview();
             } catch(e) {
                 console.error('Veri kaydedilirken hata:', e);
                 alert('Veri kaydedilirken bir hata oluştu.');
@@ -906,6 +963,85 @@
         
         function closeDebtorsModal() { document.getElementById('debtors-modal').classList.remove('show'); }
         document.getElementById('debtors-modal').addEventListener('click', function(e) { if (e.target === this) closeDebtorsModal(); });
+
+        // ============================================================
+        //  WIDGET ÖNİZLEME
+        // ============================================================
+        function refreshWidgetPreview() {
+            try {
+                const container = document.getElementById('widget-preview-content');
+                const now = new Date();
+                const next24 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+                const upcoming = lessons
+                    .filter(l => !l.completed && l.date && l.time)
+                    .filter(l => {
+                        try {
+                            const d = new Date(l.date + 'T' + (l.time || '00:00'));
+                            return d >= now && d <= next24;
+                        } catch(e) { return false; }
+                    })
+                    .sort((a,b) => {
+                        try {
+                            const da = new Date(a.date + 'T' + (a.time || '00:00'));
+                            const db = new Date(b.date + 'T' + (b.time || '00:00'));
+                            return da - db;
+                        } catch(e) { return 0; }
+                    });
+
+                if (upcoming.length === 0) {
+                    container.innerHTML = `
+                        <div class="widget-preview-empty">
+                            ✅ 24 saat içinde ders yok
+                        </div>
+                    `;
+                } else {
+                    let html = '';
+                    upcoming.slice(0, 3).forEach(l => {
+                        const student = students.find(s => s.id === l.studentId);
+                        const name = student ? `${student.name} ${student.surname}` : 'Silinmiş';
+                        html += `
+                            <div class="widget-preview-lesson">
+                                <span class="time">${l.time || 'belirtilmedi'}</span>
+                                <div class="info">
+                                    <div class="name">${name}</div>
+                                    <div class="subject">📖 ${l.subject || 'Ders'}</div>
+                                </div>
+                                ${l.fee ? `<span style="background:rgba(255,215,0,0.3);padding:2px 8px;border-radius:20px;font-size:11px;color:#ffd700;">${l.fee} ₺</span>` : ''}
+                            </div>
+                        `;
+                    });
+                    if (upcoming.length > 3) {
+                        html += `<div class="widget-preview-empty" style="font-size:12px;opacity:0.7;">+ ${upcoming.length - 3} ders daha...</div>`;
+                    }
+                    container.innerHTML = html;
+                }
+            } catch(e) {
+                console.warn('Widget önizleme hatası:', e);
+            }
+        }
+
+        // ============================================================
+        //  WIDGET BİLDİRİMİ
+        // ============================================================
+        function sendWidgetNotification() {
+            if (!notificationPermission) {
+                alert('Lütfen önce bildirim izni verin.');
+                requestNotificationPermission();
+                return;
+            }
+            
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CHECK_LESSONS'
+                });
+                showNotification('📱 Widget Bildirimi', 'Widget\'dan bildirim gönderildi!');
+            } else {
+                showNotification('📱 Ders Takip Widget', 'Bugün planlanmış derslerinizi kontrol edin!');
+            }
+            
+            alert('✅ Widget bildirimi gönderildi!');
+        }
 
         // ============================================================
         //  ÖĞRENCİ İŞLEMLERİ
@@ -2061,7 +2197,7 @@
         }
 
         // ============================================================
-        //  BİLDİRİM SİSTEMİ (GELİŞTİRİLMİŞ - WIDGET DESTEKLİ)
+        //  BİLDİRİM SİSTEMİ
         // ============================================================
         function checkNotificationPermission() {
             try {
@@ -2104,8 +2240,6 @@
                         document.querySelector('#notification-banner .actions .btn-primary').style.display = 'none'; 
                         showNotification('✅ Bildirimler Aktif', 'Ders Takip uygulaması widget bildirimleri gönderebilir.'); 
                         scheduleUpcomingNotifications();
-                        // Push aboneliğini dene
-                        subscribePush();
                     } else { 
                         alert('Bildirim izni verilmedi. Ayarlardan değiştirebilirsiniz.'); 
                     }
@@ -2140,44 +2274,6 @@
                 setTimeout(() => notification.close(), 30000);
             } catch(e) { 
                 console.warn('Bildirim gönderilemedi:', e); 
-            }
-        }
-        
-        // Widget'dan bildirim göndermek için
-        function sendWidgetNotification() {
-            if (!notificationPermission) {
-                alert('Lütfen önce bildirim izni verin.');
-                requestNotificationPermission();
-                return;
-            }
-            
-            // Service Worker'a mesaj gönder
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'CHECK_LESSONS',
-                    data: { timestamp: Date.now() }
-                });
-                showNotification('📱 Widget Bildirimi', 'Widget\'dan bildirim gönderildi!');
-            } else {
-                // Doğrudan bildirim göster
-                showNotification('📱 Ders Takip Widget', 'Bugün planlanmış derslerinizi kontrol edin!');
-            }
-            
-            alert('✅ Widget bildirimi gönderildi!');
-        }
-        
-        async function subscribePush() {
-            if (!('Notification' in window)) return;
-            if (Notification.permission !== 'granted') return;
-            if (!('serviceWorker' in navigator)) return;
-            
-            try {
-                const registration = await navigator.serviceWorker.ready;
-                // Push aboneliği için VAPID anahtarı gerekli
-                // Burada sadece bildirim izni kontrol ediliyor
-                console.log('✅ Push bildirimleri hazır');
-            } catch(e) {
-                console.warn('Push aboneliği başarısız:', e);
             }
         }
         
@@ -2266,6 +2362,7 @@
                 renderLessons();
                 renderCompleted();
                 renderPayments();
+                refreshWidgetPreview();
                 
                 const earningsTab = document.getElementById('tab-earnings');
                 if (earningsTab.classList.contains('active')) { 
@@ -2332,7 +2429,7 @@
         
         renderAll();
         
-        // Tam ekran modu - PWA'da otomatik
+        // Tam ekran modu
         if (isAndroidApp() || window.matchMedia('(display-mode: standalone)').matches) {
             setTimeout(requestFullscreen, 1000);
         }
@@ -2354,6 +2451,7 @@
         console.log('🔔 Widget bildirim desteği aktif!');
         console.log('📱 Android ekranına sığacak şekilde optimize edildi!');
         console.log('✅ Ders planlama modalında "Tamamlandı" ve "Ödeme Alındı" checkboxları eklendi!');
+        console.log('📱 Program kapalıyken widget çalışıyor!');
     </script>
 </body>
 </html>

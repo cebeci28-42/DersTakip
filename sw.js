@@ -1,8 +1,10 @@
 // sw.js - Service Worker
-const CACHE_NAME = 'ders-takip-v2';
+const CACHE_NAME = 'ders-takip-v3';
 const ASSETS = [
     '/index.html',
-    '/'
+    '/',
+    '/widget.html',
+    '/widget.js'
 ];
 
 // Install event
@@ -112,29 +114,90 @@ self.addEventListener('notificationclick', event => {
         event.waitUntil(
             clients.openWindow('/index.html')
         );
-    } else {
-        // Bildirim kapatıldı
-        console.log('Bildirim kapatıldı');
     }
 });
 
 // Widget'dan gelen mesajları dinle
 self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'CHECK_LESSONS') {
-        // Widget'dan kontrol geldi
-        console.log('📱 Widget kontrol ediyor:', event.data);
-        // Bildirim gönder
-        self.registration.showNotification('📚 Ders Takip', {
-            body: '🎯 Bugün planlanmış derslerinizi kontrol edin!',
-            icon: 'icon-192.png',
-            badge: 'icon-192.png',
-            vibrate: [200, 100, 200],
-            requireInteraction: false
+    if (event.data && event.data.type === 'GET_LESSONS') {
+        // Widget'dan ders bilgisi istendi
+        console.log('📱 Widget ders bilgisi istiyor');
+        
+        // Cache'ten verileri al
+        caches.open(CACHE_NAME).then(cache => {
+            cache.match('/index.html').then(response => {
+                if (response) {
+                    // Ders bilgilerini widget'a gönder
+                    event.ports[0].postMessage({
+                        type: 'LESSONS_DATA',
+                        data: getUpcomingLessons()
+                    });
+                }
+            });
         });
     }
 });
 
-// Periyodik kontrol (arka planda çalışır)
+// Yaklaşan dersleri getir
+function getUpcomingLessons() {
+    try {
+        // localStorage'dan dersleri al
+        const storedLessons = localStorage.getItem('math_tutor_lessons');
+        const lessons = storedLessons ? JSON.parse(storedLessons) : [];
+        const storedStudents = localStorage.getItem('math_tutor_students');
+        const students = storedStudents ? JSON.parse(storedStudents) : [];
+        
+        const now = new Date();
+        const next24 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        const next7 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        
+        const upcoming = lessons
+            .filter(l => !l.completed && l.date && l.time)
+            .filter(l => {
+                try {
+                    const d = new Date(l.date + 'T' + (l.time || '00:00'));
+                    return d >= now && d <= next24;
+                } catch(e) { return false; }
+            })
+            .sort((a,b) => {
+                try {
+                    const da = new Date(a.date + 'T' + (a.time || '00:00'));
+                    const db = new Date(b.date + 'T' + (b.time || '00:00'));
+                    return da - db;
+                } catch(e) { return 0; }
+            })
+            .map(l => {
+                const student = students.find(s => s.id === l.studentId);
+                const name = student ? `${student.name} ${student.surname}` : '(Silinmiş)';
+                return {
+                    id: l.id,
+                    studentName: name,
+                    date: formatDate(l.date),
+                    time: l.time || 'belirtilmedi',
+                    subject: l.subject || 'Ders',
+                    fee: l.fee || 0
+                };
+            });
+        
+        return upcoming;
+    } catch(e) {
+        console.warn('Widget ders getirme hatası:', e);
+        return [];
+    }
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    try {
+        const d = new Date(dateStr + 'T00:00:00');
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch(e) {
+        return dateStr;
+    }
+}
+
+// Periyodik kontrol (arka planda)
 self.addEventListener('periodicsync', event => {
     if (event.tag === 'check-lessons') {
         event.waitUntil(checkUpcomingLessons());
@@ -143,20 +206,15 @@ self.addEventListener('periodicsync', event => {
 
 async function checkUpcomingLessons() {
     try {
-        const cache = await caches.open(CACHE_NAME);
-        const response = await cache.match('/index.html');
-        if (response) {
-            // Dersleri kontrol et ve bildirim gönder
-            const now = new Date();
-            const next24 = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-            
-            // Örnek bildirim
+        const lessons = getUpcomingLessons();
+        if (lessons.length > 0) {
             self.registration.showNotification('⏰ Ders Hatırlatma', {
-                body: 'Önümüzdeki 24 saat içinde dersiniz var!',
+                body: `${lessons.length} yaklaşan dersiniz var!`,
                 icon: 'icon-192.png',
                 badge: 'icon-192.png',
                 vibrate: [200, 100, 200],
-                requireInteraction: true
+                requireInteraction: true,
+                data: { lessons: lessons }
             });
         }
     } catch(e) {
